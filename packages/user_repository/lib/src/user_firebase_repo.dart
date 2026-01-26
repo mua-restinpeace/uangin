@@ -7,15 +7,15 @@ import 'package:user_repository/src/models/user.dart';
 import 'package:user_repository/src/user_repo.dart';
 import 'package:rxdart/rxdart.dart';
 
-class UserFirebaseRepo implements UserRepository {
+class FirebaseUserRepo implements UserRepository {
   final FirebaseAuth _firebaseAuth;
   final userCollection = FirebaseFirestore.instance.collection('users');
 
-  UserFirebaseRepo({FirebaseAuth? firebaseAuth})
+  FirebaseUserRepo({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   @override
-  Stream<MyUser>? get user {
+  Stream<MyUser?> get user {
     return _firebaseAuth.authStateChanges().flatMap((firebaseUser) async* {
       if (firebaseUser == null) {
         yield MyUser.empty;

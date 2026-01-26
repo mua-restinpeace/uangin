@@ -29,7 +29,6 @@ class MyUser {
 
   @override
   String toString() {
-    // TODO: implement toString
     return 'User: $userId, $name, $email, $goalsAchieved';
   }
 }
