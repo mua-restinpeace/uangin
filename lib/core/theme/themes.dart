@@ -13,6 +13,10 @@ ThemeData get lightTheme {
         color: MyColors.onPrimary,
         fontWeight: FontWeight.w600
       ),
+      bodyLarge: TextStyle(
+        color: MyColors.onPrimary,
+        fontWeight: FontWeight.w400
+      ),
       bodyMedium: TextStyle(
         color: MyColors.grey,
         fontWeight: FontWeight.w400

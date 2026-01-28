@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:uangin/core/widgets/long_button.dart';
-import 'package:uangin/features/auth/views/login_screen.dart';
+import 'package:uangin/features/auth/views/auth_screen.dart';
+import 'package:uangin/features/auth/views/sign_in_screen.dart';
 import 'package:uangin/features/onBoarding/models/on_boarding_item.dart';
 import 'package:uangin/features/onBoarding/widgets/next_button.dart';
 import 'package:uangin/features/onBoarding/widgets/on_boarding_indicator.dart';
@@ -84,14 +85,14 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 500),
                   child: isLastPage
                       ? LongButton(
                           text: 'Get Started',
                           onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const LoginScreen())),
+                                  builder: (context) => const AuthScreen())),
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

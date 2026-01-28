@@ -6,6 +6,7 @@ class MyColors {
   static const onPrimary = Color(0xff3d3d3d);
   static const grey  = Color(0xff888989);
   static const lightGrey = Color(0xffdadada);
+  static const fillColor = Color(0xffF9FAFC);
   static const black = Color(0xff12121b);
   static const orange = Color(0xffFE724E);
   static const lightOrange = Color(0xffFCECD1);
