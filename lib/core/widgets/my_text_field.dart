@@ -40,6 +40,7 @@ class MyTextField extends StatelessWidget {
         onTap: onTap,
         cursorColor: MyColors.onPrimary,
         decoration: InputDecoration(
+            errorText: errorMsg,
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(

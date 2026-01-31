@@ -2,10 +2,10 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_repository/src/entities/entities.dart';
 import 'package:user_repository/src/models/user.dart';
 import 'package:user_repository/src/user_repo.dart';
-import 'package:rxdart/rxdart.dart';
 
 class FirebaseUserRepo implements UserRepository {
   final FirebaseAuth _firebaseAuth;
@@ -16,12 +16,24 @@ class FirebaseUserRepo implements UserRepository {
 
   @override
   Stream<MyUser?> get user {
-    return _firebaseAuth.authStateChanges().flatMap((firebaseUser) async* {
-      if (firebaseUser == null) {
-        yield MyUser.empty;
-      } else {
-        yield await userCollection.doc(firebaseUser.uid).get().then(
-            (value) => MyUser.fromEntity(UserEntity.fromJSON(value.data()!)));
+    return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
+      if(firebaseUser == null){
+        return null;
+      }
+
+      try {
+        await firebaseUser.reload();
+
+        final snap = await userCollection.doc(firebaseUser.uid).get();
+
+        if(!snap.exists || snap.data() == null){
+          return null;
+        }
+
+        return MyUser.fromEntity(UserEntity.fromJSON(snap.data()!));
+      } catch (e) {
+        log(e.toString());
+        return null;
       }
     });
   }
@@ -67,5 +79,17 @@ class FirebaseUserRepo implements UserRepository {
       log(e.toString());
       rethrow;
     }
+  }
+  
+  @override
+  Future<bool> hasOnBoardingComplete()async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('onboarding_complete') ?? false;
+  }
+  
+  @override
+  Future<void> setOnBoardingComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', true);
   }
 }

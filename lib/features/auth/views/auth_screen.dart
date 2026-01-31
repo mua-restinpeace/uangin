@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
+import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
+import 'package:uangin/features/auth/blocs/sign_up_bloc/sign_up_bloc.dart';
 import 'package:uangin/features/auth/views/sign_in_screen.dart';
 import 'package:uangin/features/auth/views/sign_up_screen.dart';
 
@@ -28,11 +32,19 @@ class _AuthScreenState extends State<AuthScreen> {
           child: child,
         ),
         child: _showLogin
-            ? SignInScreen(
-                onSwitch: toggle,
+            ? BlocProvider<SignInBloc>(
+                create: (context) => SignInBloc(
+                    context.read<AuthenticationBloc>().userRepository),
+                child: SignInScreen(
+                  onSwitch: toggle,
+                ),
               )
-            : SignUpScreen(
-                onSwitch: toggle,
+            : BlocProvider<SignUpBloc>(
+                create: (context) => SignUpBloc(
+                    context.read<AuthenticationBloc>().userRepository),
+                child: SignUpScreen(
+                  onSwitch: toggle,
+                ),
               ),
       ),
     );

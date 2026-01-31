@@ -37,6 +37,7 @@ dependencies:
   flutter_bloc:
   equatable: 
   flutter_svg: 
+  shared_preferences: 
 
   user_repository:
     path: packages/user_repository
@@ -81,7 +82,7 @@ flutter:
     - lib/assets/icons/lock.svg
     - lib/assets/icons/mail.svg
     - lib/assets/icons/eye_open.svg
-    - lib/assets/icons/eye_close.svg
+    - lib/assets/icons/eye_disable.svg
     - lib/assets/icons/person.svg
     - lib/assets/icons/arrow-right.svg
   #   - images/a_dot_ham.jpeg

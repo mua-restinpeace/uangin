@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
 import 'package:uangin/core/widgets/long_button.dart';
-import 'package:uangin/features/auth/views/auth_screen.dart';
-import 'package:uangin/features/auth/views/sign_in_screen.dart';
 import 'package:uangin/features/onBoarding/models/on_boarding_item.dart';
 import 'package:uangin/features/onBoarding/widgets/next_button.dart';
 import 'package:uangin/features/onBoarding/widgets/on_boarding_indicator.dart';
@@ -89,21 +89,28 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   child: isLastPage
                       ? LongButton(
                           text: 'Get Started',
-                          onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const AuthScreen())),
+                          onPressed: () {
+                            context.read<AuthenticationBloc>().add(AuthenticationOnBoardingCompleted());
+                          },
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              'Skip',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(fontSize: 20),
+                            GestureDetector(
+                              onTap: () {
+                                _pageController.animateToPage(3,
+                                    duration:
+                                        const Duration(milliseconds: 1000),
+                                    curve: Curves.easeInOut);
+                              },
+                              child: Text(
+                                'Skip',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontSize: 20),
+                              ),
                             ),
                             OnBoardingIndicator(currentIndex: _currentIndex),
                             NextButton(
