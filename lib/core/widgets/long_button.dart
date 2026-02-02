@@ -19,7 +19,7 @@ class LongButton extends StatelessWidget {
           ),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 16, color: MyColors.lightBackground),
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 16, color: MyColors.white),
         )),
     );
   }

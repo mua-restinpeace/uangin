@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
 import 'package:uangin/core/widgets/long_button.dart';
 import 'package:uangin/features/onBoarding/models/on_boarding_item.dart';
-import 'package:uangin/features/onBoarding/widgets/next_button.dart';
+import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/features/onBoarding/widgets/on_boarding_indicator.dart';
 import 'package:uangin/features/onBoarding/widgets/on_boarding_page.dart';
 
@@ -113,8 +113,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               ),
                             ),
                             OnBoardingIndicator(currentIndex: _currentIndex),
-                            NextButton(
+                            MyButton(
                               onTap: _nextPage,
+                              content: SvgPicture.asset('lib/assets/icons/arrow-right.svg'),
                             ),
                           ],
                         ),

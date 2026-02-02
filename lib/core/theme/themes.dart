@@ -25,7 +25,7 @@ ThemeData get lightTheme {
     colorScheme: const ColorScheme.light(
       primary: MyColors.primary,
       onPrimary: MyColors.onPrimary,
-      surface: MyColors.lightBackground,
+      surface: MyColors.white,
       onSurface: MyColors.onPrimary
     )
   );

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:uangin/core/theme/colors.dart';
 
-class NextButton extends StatelessWidget {
+class MyButton extends StatelessWidget {
   final VoidCallback onTap;
-  const NextButton({required this.onTap, super.key});
+  final Widget content;
+  final EdgeInsets padding;
+  const MyButton({required this.onTap, required this.content, this.padding = const EdgeInsets.all(16), super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +15,8 @@ class NextButton extends StatelessWidget {
         decoration: BoxDecoration(
             color: MyColors.black,
             borderRadius: BorderRadius.all(const Radius.circular(16))),
-        padding: EdgeInsets.all(16),
-        child: SvgPicture.asset('lib/assets/icons/arrow-right.svg'),
+        padding: padding,
+        child: content,
       ),
     );
   }
