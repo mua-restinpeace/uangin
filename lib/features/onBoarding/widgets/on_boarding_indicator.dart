@@ -14,8 +14,8 @@ class OnBoardingIndicator extends StatelessWidget {
       children: List.generate(
         total,
         (index) => AnimatedContainer(
-          duration: Duration(milliseconds: 400),
-          margin: EdgeInsets.symmetric(horizontal: 4),
+          duration: const Duration(milliseconds: 400),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           width: index == currentIndex ? 20 : 8,
           height: 8,
           decoration: BoxDecoration(

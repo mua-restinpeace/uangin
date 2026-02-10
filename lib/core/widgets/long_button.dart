@@ -14,7 +14,7 @@ class LongButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
             backgroundColor: MyColors.black,
-            padding: EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(12))
           ),
         child: Text(

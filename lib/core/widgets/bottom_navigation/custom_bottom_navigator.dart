@@ -60,7 +60,7 @@ class CustomBottomNavigator extends StatelessWidget {
             child: GestureDetector(
               onTap: onAddTap,
               child: Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Theme.of(context).colorScheme.primary,

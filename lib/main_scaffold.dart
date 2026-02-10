@@ -20,7 +20,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: [
           IndexedStack(
             index: _selectedIndex,
-            children: [HomeScreen(), ProfileScreen()],
+            children: const [HomeScreen(), ProfileScreen()],
           ),
           Align(
             alignment: Alignment.bottomCenter,
