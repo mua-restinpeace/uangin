@@ -20,18 +20,21 @@ class UserEntity {
       'name': name,
       'email': email,
       'currentAllowance': currentAllowance,
-      'lastAllowanceDate': lastAllowanceDate,
+      'lastAllowanceDate': lastAllowanceDate?.millisecondsSinceEpoch,
       'goalsAchieved': goalsAchieved
     };
   }
 
   static UserEntity fromJSON(Map<String, dynamic> doc) {
     return UserEntity(
-        userId: doc['userId'],
-        name: doc['name'],
-        email: doc['email'],
-        currentAllowance: doc['currentAllowance'],
-        lastAllowanceDate: doc['lastAllowanceDate'],
-        goalsAchieved: doc['goalsAchieved']);
+        userId: (doc['userId'] as String),
+        name: (doc['name'] as String),
+        email: (doc['email'] as String),
+        currentAllowance: (doc['currentAllowance'] as int?)?.toDouble() ?? 0.0,
+        lastAllowanceDate: doc['latestAllowanceDate'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(
+                doc['lastAllowanceDate'] as int)
+            : null,
+        goalsAchieved: (doc['goalsAchieved'] as num?)?.toInt() ?? 0);
   }
 }

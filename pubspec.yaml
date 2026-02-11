@@ -38,6 +38,7 @@ dependencies:
   equatable: 
   flutter_svg: 
   shared_preferences: 
+  money_formatter:
 
   user_repository:
     path: packages/user_repository

@@ -1,46 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
+import 'package:uangin/features/home/blocs/get_current_allowance/get_current_allowance_bloc.dart';
+import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(
-                height: 16,
-              ),
-              _buildAllowanceCard(context),
-              const SizedBox(
-                height: 16,
-              ),
-              Text(
-                'Spending',
-                style: Theme.of(context)
-                    .textTheme
-                    .displayLarge
-                    ?.copyWith(fontSize: 20),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              _buildSpendingSection(context),
-              const SizedBox(
-                height: 16,
-              ),
-              _buildTrancsactionSection(context),
-              const SizedBox(height: 100,)
-            ],
+    return BlocProvider(
+      create: (context) =>
+          GetCurrentAllowanceBloc(context.read<UserRepository>())..add(GetCurrentAllowance()),
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(
+                  height: 16,
+                ),
+                BlocBuilder<GetCurrentAllowanceBloc, GetCurrentAllowanceState>(
+                  builder: (context, state) {
+                    if (state is GetCurrentAllowanceLoading) {
+                      return const CircularProgressIndicator();
+                    } else if (state is GetCurrentAllowanceSuccess) {
+                      MoneyFormatter allowance = MoneyFormatter(amount: state.currentAllowance);
+                      return _buildAllowanceCard(context, allowance.output.nonSymbol);
+                    }
+                    return _buildAllowanceCard(context, (0.0).toString());
+                  },
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Text(
+                  'Spending',
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge
+                      ?.copyWith(fontSize: 20),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                _buildSpendingSection(context),
+                const SizedBox(
+                  height: 16,
+                ),
+                _buildTrancsactionSection(context),
+                const SizedBox(
+                  height: 100,
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -73,7 +93,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAllowanceCard(BuildContext context) {
+  Widget _buildAllowanceCard(BuildContext context, String currentAllowance) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
@@ -116,7 +136,7 @@ class HomeScreen extends StatelessWidget {
                 width: 4,
               ),
               Text(
-                '350.000',
+                currentAllowance.toString(),
                 style: Theme.of(context)
                     .textTheme
                     .displayLarge

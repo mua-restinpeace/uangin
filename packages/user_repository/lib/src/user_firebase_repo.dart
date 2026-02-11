@@ -18,6 +18,7 @@ class FirebaseUserRepo implements UserRepository {
   Stream<MyUser?> get user {
     return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
       if(firebaseUser == null){
+        log('firebase user was null');
         return null;
       }
 
@@ -27,12 +28,15 @@ class FirebaseUserRepo implements UserRepository {
         final snap = await userCollection.doc(firebaseUser.uid).get();
 
         if(!snap.exists || snap.data() == null){
+          log('snapshot was null');
           return null;
         }
 
+        log('Stream user: ${snap.data()}');
         return MyUser.fromEntity(UserEntity.fromJSON(snap.data()!));
       } catch (e) {
         log(e.toString());
+        log('Stream user: catch an error');
         return null;
       }
     });
@@ -42,7 +46,9 @@ class FirebaseUserRepo implements UserRepository {
   Future<void> signIn(String email, String password) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: email, password: password).then((UserCredential){
+            log('Sign in success: $UserCredential');
+          });
     } catch (e) {
       log(e.toString());
       rethrow;
