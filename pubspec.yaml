@@ -36,6 +36,8 @@ dependencies:
   bloc:
   flutter_bloc:
   equatable: 
+  flutter_svg: 
+  shared_preferences: 
 
   user_repository:
     path: packages/user_repository
@@ -68,8 +70,21 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - lib/assets/images/Uangin..svg
+    - lib/assets/images/Personal finance-cuate 1.svg
+    - lib/assets/images/Plain credit card-cuate 1.svg
+    - lib/assets/images/Plain credit card-rafiki 1.svg
+    - lib/assets/images/Wallet-cuate 1.svg
+    - lib/assets/icons/apple.svg
+    - lib/assets/icons/facebook.svg
+    - lib/assets/icons/google.svg
+    - lib/assets/icons/lock.svg
+    - lib/assets/icons/mail.svg
+    - lib/assets/icons/eye_open.svg
+    - lib/assets/icons/eye_disable.svg
+    - lib/assets/icons/person.svg
+    - lib/assets/icons/arrow-right.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
