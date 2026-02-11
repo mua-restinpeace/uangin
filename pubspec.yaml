@@ -39,6 +39,7 @@ dependencies:
   flutter_svg: 
   shared_preferences: 
   money_formatter:
+  intl:
 
   user_repository:
     path: packages/user_repository
@@ -93,6 +94,7 @@ flutter:
     - lib/assets/icons/bell.svg
     - lib/assets/icons/plus.svg
     - lib/assets/icons/eye_open_white.svg
+    - lib/assets/icons/eye_close_white.svg
     - lib/assets/icons/lend_money.svg
     - lib/assets/icons/chart.svg
     - lib/assets/icons/car.svg

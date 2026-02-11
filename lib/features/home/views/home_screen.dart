@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
-import 'package:uangin/features/home/blocs/get_current_allowance/get_current_allowance_bloc.dart';
+import 'package:uangin/features/home/blocs/user/get_user/get_user_bloc.dart';
 import 'package:user_repository/user_repository.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String date = DateFormat('EEE, dd MMMM yyyy').format(DateTime.now());
+  bool _showCurrentAllowance = false;
+
+  void toggleShowCurrentAllowance() {
+    setState(() {
+      _showCurrentAllowance = !_showCurrentAllowance;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          GetCurrentAllowanceBloc(context.read<UserRepository>())..add(GetCurrentAllowance()),
+          GetUserBloc(context.read<UserRepository>())..add(GetUser()),
       child: Scaffold(
         body: SafeArea(
           child: Padding(
@@ -23,19 +38,31 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context),
+                BlocBuilder<GetUserBloc, GetUserState>(
+                  builder: (context, state) {
+                    if (state is GetUserLoading) {
+                      return const CircularProgressIndicator();
+                    } else if (state is GetUserSuccess) {
+                      return _buildHeader(context, state.user.name);
+                    }
+
+                    return _buildHeader(context, '');
+                  },
+                ),
                 const SizedBox(
                   height: 16,
                 ),
-                BlocBuilder<GetCurrentAllowanceBloc, GetCurrentAllowanceState>(
+                BlocBuilder<GetUserBloc, GetUserState>(
                   builder: (context, state) {
-                    if (state is GetCurrentAllowanceLoading) {
+                    if (state is GetUserLoading) {
                       return const CircularProgressIndicator();
-                    } else if (state is GetCurrentAllowanceSuccess) {
-                      MoneyFormatter allowance = MoneyFormatter(amount: state.currentAllowance);
-                      return _buildAllowanceCard(context, allowance.output.nonSymbol);
+                    } else if (state is GetUserSuccess) {
+                      MoneyFormatter allowance =
+                          MoneyFormatter(amount: state.user.currentAllowance);
+                      return _buildAllowanceCard(
+                          context, allowance.output.nonSymbol, date);
                     }
-                    return _buildAllowanceCard(context, (0.0).toString());
+                    return _buildAllowanceCard(context, (0.0).toString(), date);
                   },
                 ),
                 const SizedBox(
@@ -67,7 +94,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, String name) {
     return Row(
       children: [
         SvgPicture.asset(
@@ -79,7 +106,7 @@ class HomeScreen extends StatelessWidget {
           width: 12,
         ),
         Text(
-          'Hi, Jeda',
+          'Hi, $name',
           style:
               Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 20),
         ),
@@ -93,7 +120,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAllowanceCard(BuildContext context, String currentAllowance) {
+  Widget _buildAllowanceCard(
+      BuildContext context, String currentAllowance, String date) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
@@ -112,7 +140,7 @@ class HomeScreen extends StatelessWidget {
                     ?.copyWith(fontSize: 16),
               ),
               Text(
-                '12th January 2026',
+                date,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
@@ -136,7 +164,11 @@ class HomeScreen extends StatelessWidget {
                 width: 4,
               ),
               Text(
-                currentAllowance.toString(),
+                _showCurrentAllowance
+                    ? currentAllowance.toString()
+                    : currentAllowance
+                        .toString()
+                        .replaceAll(RegExp(r"[^,.]"), "•"),
                 style: Theme.of(context)
                     .textTheme
                     .displayLarge
@@ -151,7 +183,9 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MyButton(
-                onTap: () {},
+                onTap: () {
+                  
+                },
                 content: Row(
                   children: [
                     SvgPicture.asset(
@@ -175,12 +209,18 @@ class HomeScreen extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               ),
               MyButton(
-                onTap: () {},
-                content: SvgPicture.asset(
-                  'lib/assets/icons/eye_open_white.svg',
-                  width: 24,
-                  height: 24,
-                ),
+                onTap: toggleShowCurrentAllowance,
+                content: _showCurrentAllowance
+                    ? SvgPicture.asset(
+                        'lib/assets/icons/eye_open_white.svg',
+                        width: 24,
+                        height: 24,
+                      )
+                    : SvgPicture.asset(
+                        'lib/assets/icons/eye_close_white.svg',
+                        width: 24,
+                        height: 24,
+                      ),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               )

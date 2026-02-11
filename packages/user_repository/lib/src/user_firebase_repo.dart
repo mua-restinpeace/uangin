@@ -31,8 +31,7 @@ class FirebaseUserRepo implements UserRepository {
           log('snapshot was null');
           return null;
         }
-
-        log('Stream user: ${snap.data()}');
+;
         return MyUser.fromEntity(UserEntity.fromJSON(snap.data()!));
       } catch (e) {
         log(e.toString());
@@ -46,9 +45,7 @@ class FirebaseUserRepo implements UserRepository {
   Future<void> signIn(String email, String password) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password).then((UserCredential){
-            log('Sign in success: $UserCredential');
-          });
+          email: email, password: password);
     } catch (e) {
       log(e.toString());
       rethrow;

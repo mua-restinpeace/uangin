@@ -2,7 +2,6 @@ import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/app_view.dart';
-import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:user_repository/user_repository.dart';
 import 'blocs/authenticaton_bloc/authentication_bloc.dart';
 

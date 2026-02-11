@@ -4,35 +4,39 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:user_repository/user_repository.dart';
 
-part 'get_current_allowance_event.dart';
-part 'get_current_allowance_state.dart';
+part 'get_user_event.dart';
+part 'get_user_state.dart';
 
-class GetCurrentAllowanceBloc
-    extends Bloc<GetCurrentAllowanceEvent, GetCurrentAllowanceState> {
+class GetUserBloc
+    extends Bloc<GetUserEvent, GetUserState> {
   final UserRepository _userRepository;
   StreamSubscription<MyUser?>? _userSubsription;
 
-  GetCurrentAllowanceBloc(this._userRepository) : super(GetCurrentAllowanceInitial()) {
-    on<GetCurrentAllowance>((event, emit) async {
-      emit(GetCurrentAllowanceLoading());
+  GetUserBloc(this._userRepository) : super(GetUserInitial()) {
+    on<GetUser>((event, emit) async {
+      emit(GetUserLoading());
       try {
         await _userSubsription?.cancel();
 
         _userSubsription = _userRepository.user.listen((user) {
           if (user != null && user.isNotEmpty) {
-            add(GetCurrentAllowanceUpdated(user.currentAllowance));
+            add(GetUserUpdated(user));
           } else {
-            add(GetCurrentAllowanceUpdated(0.0));
+            add(const GetUserUpdated(null));
           }
         });
       } catch (e) {
-        emit(GetCurrentAllowanceFailure());
+        emit(GetUserFailure());
       }
     });
 
-    on<GetCurrentAllowanceUpdated>(
+    on<GetUserUpdated>(
       (event, emit) {
-        emit(GetCurrentAllowanceSuccess(event.currentAllowance));
+        if(event.user != null){
+          emit(GetUserSuccess(event.user!));
+        }else{
+          emit(GetUserFailure());
+        }
       },
     );
   }
