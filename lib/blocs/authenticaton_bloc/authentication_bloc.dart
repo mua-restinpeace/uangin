@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -14,6 +15,15 @@ class AuthenticationBloc
 
   AuthenticationBloc({required this.userRepository})
       : super(const AuthenticationState.unknown()) {
+    _userSubscription = userRepository.user.listen((user) {
+      if (user == null) {
+        log('user was null. authentication logout request called');
+        add(AuthenticatonLogoutRequest());
+      } else {
+        log('Authentication user changed: $user');
+        add(AuthenticationUserChanged(user));
+      }
+    });
     on<AuthenticationUserChanged>((event, emit) {
       emit(AuthenticationState.authenticated(event.user));
     });
@@ -27,17 +37,9 @@ class AuthenticationBloc
       }
     });
 
-    on<AuthenticationOnBoardingCompleted>((event, emit) async{
+    on<AuthenticationOnBoardingCompleted>((event, emit) async {
       await userRepository.setOnBoardingComplete();
       emit(const AuthenticationState.unauthenticated());
-    });
-
-    _userSubscription = userRepository.user.listen((user) {
-      if (user == null) {
-        add(AuthenticatonLogoutRequest());
-      } else {
-        add(AuthenticationUserChanged(user));
-      }
     });
   }
 

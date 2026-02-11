@@ -38,9 +38,14 @@ dependencies:
   equatable: 
   flutter_svg: 
   shared_preferences: 
+  money_formatter:
+  intl:
 
   user_repository:
     path: packages/user_repository
+
+  allowance_repository:
+    path: packages/allowance_repository
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -85,7 +90,23 @@ flutter:
     - lib/assets/icons/eye_disable.svg
     - lib/assets/icons/person.svg
     - lib/assets/icons/arrow-right.svg
-  #   - images/a_dot_ham.jpeg
+    - lib/assets/icons/profile.svg
+    - lib/assets/icons/bell.svg
+    - lib/assets/icons/plus.svg
+    - lib/assets/icons/eye_open_white.svg
+    - lib/assets/icons/eye_close_white.svg
+    - lib/assets/icons/lend_money.svg
+    - lib/assets/icons/chart.svg
+    - lib/assets/icons/car.svg
+    - lib/assets/icons/cart.svg
+    - lib/assets/icons/dumbell.svg
+    - lib/assets/icons/knife_fork.svg
+    - lib/assets/icons/other.svg
+    - lib/assets/icons/smile_face.svg
+    - lib/assets/icons/tag.svg
+    - lib/assets/icons/home.svg
+    - lib/assets/icons/nav_profile.svg
+    - lib/assets/icons/nav_plus.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

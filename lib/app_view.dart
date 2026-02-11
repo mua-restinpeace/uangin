@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
-import 'package:uangin/features/home/views/home_screen.dart';
 import 'package:uangin/features/onBoarding/views/on_boarding_screen.dart';
 import 'package:uangin/features/onBoarding/views/splash_screen.dart';
 import 'package:uangin/core/theme/themes.dart';
+import 'package:uangin/main_scaffold.dart';
 
 class MyAppView extends StatefulWidget {
   const MyAppView({super.key});
@@ -43,7 +43,7 @@ class _MyAppViewState extends State<MyAppView> {
           }
 
           if (state.status == AuthenticationStatus.authenticated) {
-            return const HomeScreen();
+            return const MainScaffold();
           }
 
           if(state.status == AuthenticationStatus.unauthenticated){

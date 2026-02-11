@@ -181,9 +181,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             text: 'Sign In',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                context.read<SignInBloc>().add(SignInRequired(
-                                    emailController.text,
-                                    passwordController.text));
+                                setState(() {
+                                  context.read<SignInBloc>().add(SignInRequired(
+                                      emailController.text,
+                                      passwordController.text));
+                                });
                               }
                             });
                       },
