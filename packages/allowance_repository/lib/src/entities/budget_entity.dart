@@ -3,6 +3,7 @@ class BudgetEntity {
   String userId;
   String name;
   String icon;
+  String color;
   double allocatedAmount;
   double spentAmount;
   bool isActive;
@@ -14,6 +15,7 @@ class BudgetEntity {
       required this.userId,
       required this.name,
       required this.icon,
+      required this.color,
       required this.allocatedAmount,
       this.spentAmount = 0.0,
       this.isActive = true,
@@ -26,6 +28,7 @@ class BudgetEntity {
       'userId': userId,
       'name': name,
       'icon': icon,
+      'color': color,
       'allocatedAmount': allocatedAmount,
       'spentAmount': spentAmount,
       'isActive': isActive,
@@ -40,6 +43,7 @@ class BudgetEntity {
         userId: doc['userId'] as String,
         name: doc['name'] as String,
         icon: doc['icon'] as String,
+        color: doc['color'] as String,
         allocatedAmount: (doc['allocatedAmount'] as num).toDouble(),
         spentAmount: (doc['spentAmount'] as num).toDouble(),
         periodStart: DateTime.fromMillisecondsSinceEpoch(doc['periodStart'] as int),

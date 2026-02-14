@@ -8,6 +8,7 @@ class Budgets extends Equatable {
   String userId;
   String name;
   String icon;
+  String color;
   double allocatedAmount;
   double spentAmount;
   DateTime? periodStart;
@@ -19,6 +20,7 @@ class Budgets extends Equatable {
       required this.userId,
       required this.name,
       required this.icon,
+      required this.color,
       required this.allocatedAmount,
       this.spentAmount = 0.0,
       required this.periodStart,
@@ -30,6 +32,7 @@ class Budgets extends Equatable {
       userId: '',
       name: '',
       icon: '',
+      color: '',
       allocatedAmount: 0,
       periodStart: null,
       periodEnd: null,
@@ -48,6 +51,7 @@ class Budgets extends Equatable {
         userId: userId,
         name: name,
         icon: icon,
+        color: color,
         allocatedAmount: allocatedAmount,
         spentAmount: spentAmount,
         isActive: isActive,
@@ -61,6 +65,7 @@ class Budgets extends Equatable {
         userId: entity.userId,
         name: entity.name,
         icon: entity.icon,
+        color: entity.color,
         allocatedAmount: entity.allocatedAmount,
         spentAmount: entity.spentAmount,
         periodStart: entity.periodStart,
@@ -73,6 +78,7 @@ class Budgets extends Equatable {
       String? userId,
       String? name,
       String? icon,
+      String? color,
       double? allocatedAmount,
       double? spentAmount,
       DateTime? periodStart,
@@ -83,6 +89,7 @@ class Budgets extends Equatable {
         userId: userId ?? this.userId,
         name: name ?? this.name,
         icon: icon ?? this.icon,
+        color: color ?? this.color,
         allocatedAmount: allocatedAmount ?? this.allocatedAmount,
         periodStart: periodStart ?? this.periodStart,
         periodEnd: periodEnd ?? this.periodEnd);
@@ -90,7 +97,7 @@ class Budgets extends Equatable {
 
   @override
   String toString() {
-    return 'Budget: $budgetId, $userId, $name, $icon, $allocatedAmount, $spentAmount, $periodStart, $periodEnd, $isActive';
+    return 'Budget: $budgetId, $userId, $name, $icon, $color, $allocatedAmount, $spentAmount, $periodStart, $periodEnd, $isActive';
   }
 
   @override
@@ -99,6 +106,7 @@ class Budgets extends Equatable {
         userId,
         name,
         icon,
+        color,
         allocatedAmount,
         spentAmount,
         periodStart,
