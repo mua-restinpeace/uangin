@@ -6,7 +6,7 @@ import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
-import 'package:uangin/features/home/blocs/user/get_user/get_user_bloc.dart';
+import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,11 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          GetUserBloc(context.read<UserRepository>())..add(GetUser()),
-      child: Scaffold(
-        body: SafeArea(
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -41,11 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 BlocBuilder<GetUserBloc, GetUserState>(
                   builder: (context, state) {
                     if (state is GetUserLoading) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     } else if (state is GetUserSuccess) {
                       return _buildHeader(context, state.user.name);
                     }
-
+          
                     return _buildHeader(context, '');
                   },
                 ),
@@ -55,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 BlocBuilder<GetUserBloc, GetUserState>(
                   builder: (context, state) {
                     if (state is GetUserLoading) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     } else if (state is GetUserSuccess) {
                       MoneyFormatter allowance =
                           MoneyFormatter(amount: state.user.currentAllowance);
@@ -183,9 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MyButton(
-                onTap: () {
-                  
-                },
+                onTap: () {},
                 content: Row(
                   children: [
                     SvgPicture.asset(
@@ -429,10 +425,15 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 return Row(
                   children: [
-                    SvgPicture.asset(
-                      'lib/assets/icons/knife_fork.svg',
-                      height: 44,
-                      width: 44,
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.circle, color: MyColors.lightOrange),
+                      child: SvgPicture.asset(
+                        'lib/assets/icons/knife_fork.svg',
+                        height: 24,
+                        width: 24,
+                      ),
                     ),
                     const SizedBox(
                       width: 12,

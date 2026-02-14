@@ -20,6 +20,7 @@ abstract class AllowanceRepository {
       {required String userId,
       required String name,
       required String icon,
+      required String color,
       required double allocatedAmount,
       required DateTime periodStart,
       required DateTime periodEnd});

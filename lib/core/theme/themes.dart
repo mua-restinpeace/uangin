@@ -26,7 +26,8 @@ ThemeData get lightTheme {
       primary: MyColors.primary,
       onPrimary: MyColors.onPrimary,
       surface: MyColors.white,
-      onSurface: MyColors.onPrimary
+      onSurface: MyColors.onPrimary,
+      
     )
   );
 }

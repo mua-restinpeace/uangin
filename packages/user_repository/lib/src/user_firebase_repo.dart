@@ -31,7 +31,7 @@ class FirebaseUserRepo implements UserRepository {
           log('snapshot was null');
           return null;
         }
-;
+        log('user: ${snap.data()}');
         return MyUser.fromEntity(UserEntity.fromJSON(snap.data()!));
       } catch (e) {
         log(e.toString());

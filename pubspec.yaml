@@ -107,6 +107,8 @@ flutter:
     - lib/assets/icons/home.svg
     - lib/assets/icons/nav_profile.svg
     - lib/assets/icons/nav_plus.svg
+    - lib/assets/icons/arrow_left.svg
+    - lib/assets/icons/card.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

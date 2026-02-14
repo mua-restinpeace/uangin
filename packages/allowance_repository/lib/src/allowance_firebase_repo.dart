@@ -118,6 +118,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
       {required String userId,
       required String name,
       required String icon,
+      required String color,
       required double allocatedAmount,
       required DateTime periodStart,
       required DateTime periodEnd}) async {
@@ -133,6 +134,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           userId: userId,
           name: name,
           icon: icon,
+          color: color,
           allocatedAmount: allocatedAmount,
           periodStart: periodStart,
           periodEnd: periodEnd,
