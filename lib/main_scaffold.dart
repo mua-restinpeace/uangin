@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/bottom_navigation/custom_bottom_navigator.dart';
 import 'package:uangin/features/add_expense/views/add_expense_screen.dart';
 import 'package:uangin/features/home/views/home_screen.dart';
@@ -25,19 +27,30 @@ class _MainScaffoldState extends State<MainScaffold> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: CustomBottomNavigator(
-              selectedIndex: _selectedIndex,
-              onIndexChanged: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              onAddTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddExpenseScreen(),
-                    ));
+            child: BlocBuilder<GetUserBloc, GetUserState>(
+              builder: (context, state) {
+                return CustomBottomNavigator(
+                  selectedIndex: _selectedIndex,
+                  onIndexChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  onAddTap: () {
+                    if (state is GetUserSuccess) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddExpenseScreen(
+                              userId: state.user.userId,
+                            ),
+                          ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Please wait, loading user data...')));
+                    }
+                  },
+                );
               },
             ),
           )

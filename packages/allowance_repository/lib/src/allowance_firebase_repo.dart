@@ -256,6 +256,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
       required String budgetId,
       required String budgetName,
       required String budgetIcon,
+      required String budgetColor,
       required double amount,
       required DateTime date,
       TransactionType type = TransactionType.expense,
@@ -273,10 +274,11 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           budgetId: budgetId,
           budgetName: budgetName,
           budgetIcon: budgetIcon,
+          budgetColor: budgetColor,
           amount: amount,
           date: date,
           description: description,
-          type: type);
+          type: type,);
 
       final batch = _firestore.batch();
 

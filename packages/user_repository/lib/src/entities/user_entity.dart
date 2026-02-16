@@ -30,7 +30,7 @@ class UserEntity {
         userId: (doc['userId'] as String),
         name: (doc['name'] as String),
         email: (doc['email'] as String),
-        currentAllowance: (doc['currentAllowance'] as int?)?.toDouble() ?? 0.0,
+        currentAllowance: (doc['currentAllowance'] as num?)?.toDouble() ?? 0.0,
         lastAllowanceDate: doc['latestAllowanceDate'] != null
             ? DateTime.fromMillisecondsSinceEpoch(
                 doc['lastAllowanceDate'] as int)

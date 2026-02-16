@@ -24,10 +24,15 @@ abstract class AllowanceRepository {
       required double allocatedAmount,
       required DateTime periodStart,
       required DateTime periodEnd});
+
   Future<void> updateBudget(Budgets budget);
+
   Future<void> deleteBudget(String userId, String budgetId);
+
   Stream<List<Budgets>> getActiveBudgets(String userId);
+
   Future<Budgets?> getBudget(String userId, String budgetId);
+
   Future<void> udpateBudgetSpentAmount(
       String userId, String budgetId, double amountToAdd);
 
@@ -37,15 +42,20 @@ abstract class AllowanceRepository {
       required String budgetId,
       required String budgetName,
       required String budgetIcon,
+      required String budgetColor,
       required double amount,
       required DateTime date,
       TransactionType type = TransactionType.expense,
       String? description});
+
   Stream<List<Transactions>> getTransactions(String userId);
+
   Stream<List<Transactions>> getTransactionByDateRange(
       String userId, DateTime startDate, DateTime endDate);
+
   Stream<List<Transactions>> getTransactionByBudget(
       String userId, String budgetId);
+
   Future<void> deleteTransaction(String userId, String transactionId);
 
   // saving goal operations
@@ -56,10 +66,14 @@ abstract class AllowanceRepository {
       required String icon,
       required double targetAmount,
       DateTime? targetDate});
+
   Future<void> updateSavingGoalProgress(
       String userId, String goalId, double amountToAdd);
+
   Stream<List<SavingGoals>> getActiveSavingGoals(String userId);
+
   Stream<List<SavingGoals>> getCompletedSavingGoals(String userId);
+
   Future<void> deleteSavingGoal(String userId, String goalId);
 
   // analytics & summary operations
@@ -68,6 +82,7 @@ abstract class AllowanceRepository {
     DateTime periodStart,
     DateTime periodEnd,
   );
+  
   Future<Map<String, dynamic>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd);
 }

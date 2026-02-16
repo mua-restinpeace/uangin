@@ -55,8 +55,8 @@ class Budgets extends Equatable {
         allocatedAmount: allocatedAmount,
         spentAmount: spentAmount,
         isActive: isActive,
-        periodStart: periodStart,
-        periodEnd: periodEnd);
+        periodStart: periodStart!,
+        periodEnd: periodEnd!);
   }
 
   static Budgets fromEntity(BudgetEntity entity) {
@@ -73,7 +73,7 @@ class Budgets extends Equatable {
         isActive: entity.isActive);
   }
 
-  Budgets copyWith(
+  Budgets copyWith({
       String? budgetId,
       String? userId,
       String? name,
@@ -83,7 +83,7 @@ class Budgets extends Equatable {
       double? spentAmount,
       DateTime? periodStart,
       DateTime? periodEnd,
-      bool? isActive) {
+      bool? isActive}) {
     return Budgets(
         budgetId: budgetId ?? this.budgetId,
         userId: userId ?? this.userId,
