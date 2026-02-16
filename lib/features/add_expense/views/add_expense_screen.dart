@@ -7,11 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/long_button.dart';
+import 'package:uangin/features/add_expense/bloc/add_expense/add_expense_bloc.dart';
 import 'package:uangin/features/add_expense/bloc/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final String userId;
+  const AddExpenseScreen({required this.userId, super.key});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -74,11 +76,37 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         MoneyFormatter remainingAllowance =
             MoneyFormatter(amount: userState.user.currentAllowance);
 
-        return BlocProvider(
-          create: (context) =>
-              GetBudgetsBloc(context.read<AllowanceRepository>())
-                ..add(GetBudgets(userState.user.userId)),
-          child: _buildContent(remainingAllowance.output.nonSymbol),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) =>
+                  AddExpenseBloc(context.read<AllowanceRepository>()),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  GetBudgetsBloc(context.read<AllowanceRepository>())
+                    ..add(GetBudgets(userState.user.userId)),
+            ),
+          ],
+          child: BlocListener<AddExpenseBloc, AddExpenseState>(
+            listener: (context, state) {
+              if (state is AddExpenseSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Expense added successfully!'),
+                  backgroundColor: MyColors.green,
+                ));
+                Navigator.pop(context);
+              } else if (state is AddExpenseFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to add expense: ${state.message!}'),
+                    backgroundColor: MyColors.red,
+                  ),
+                );
+              }
+            },
+            child: _buildContent(remainingAllowance.output.nonSymbol),
+          ),
         );
       },
     );
@@ -120,12 +148,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom -
-                  MediaQuery.of(context).viewInsets.bottom,
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom -
+                    MediaQuery.of(context).viewInsets.bottom,
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Form(
@@ -140,9 +169,20 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                         const SizedBox(
                           height: 24,
                         ),
-                        LongButton(
-                          text: 'Add',
-                          onPressed: () {},
+                        BlocBuilder<AddExpenseBloc, AddExpenseState>(
+                          builder: (context, state) {
+                            if (state is AddExpenseLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return Builder(builder: (context) {
+                              return LongButton(
+                                text: 'Add',
+                                onPressed: () => _handleExpenseAdd(context),
+                              );
+                            });
+                          },
                         ),
                         const SizedBox(
                           height: 24,
@@ -529,7 +569,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
   Widget _buildCategoriesSelection() {
     return BlocBuilder<GetBudgetsBloc, GetBudgetsState>(
       builder: (context, state) {
-        if(state is GetBudgetsLoading){
+        if (state is GetBudgetsLoading) {
           return const SizedBox(
             height: 56,
             child: Center(
@@ -569,8 +609,39 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
           );
         }
 
-        return const SizedBox(height: 56,);
+        return const SizedBox(
+          height: 56,
+        );
       },
     );
+  }
+
+  void _handleExpenseAdd(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedBudgets == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Please select budgets for this expense')));
+        return;
+      }
+
+      final amount = double.tryParse(_amountController.text);
+      if (amount == null || amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a valid amount')));
+        return;
+      }
+
+      context.read<AddExpenseBloc>().add(AddExpenseSubmitted(
+          userId: widget.userId,
+          budgetId: _selectedBudgets!.budgetId,
+          budgetName: _selectedBudgets!.name,
+          budgetIcon: _selectedBudgets!.icon,
+          budgetColor: _selectedBudgets!.color,
+          amount: amount,
+          date: DateTime.now(),
+          description: _descriptionController.text.isEmpty
+              ? null
+              : _descriptionController.text));
+    }
   }
 }

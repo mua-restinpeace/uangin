@@ -7,7 +7,9 @@ sealed class GetUserEvent extends Equatable {
   List<Object?> get props => [];
   
 }
-class GetUser extends GetUserEvent {}
+class GetUser extends GetUserEvent {
+  const GetUser();
+}
 
 class GetUserUpdated extends GetUserEvent{
   final MyUser? user;

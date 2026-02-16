@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,7 +9,6 @@ import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
-import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +21,20 @@ class _HomeScreenState extends State<HomeScreen> {
   String date = DateFormat('EEE, dd MMMM yyyy').format(DateTime.now());
   bool _showCurrentAllowance = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
+    final userState = context.read<GetUserBloc>().state;
+    if (userState is GetUserSuccess) {
+      // todo
+      // reload data with context
+    }
+  }
+
   void toggleShowCurrentAllowance() {
     setState(() {
       _showCurrentAllowance = !_showCurrentAllowance;
@@ -30,61 +45,69 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BlocBuilder<GetUserBloc, GetUserState>(
-                  builder: (context, state) {
-                    if (state is GetUserLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is GetUserSuccess) {
-                      return _buildHeader(context, state.user.name);
-                    }
-          
-                    return _buildHeader(context, '');
-                  },
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                BlocBuilder<GetUserBloc, GetUserState>(
-                  builder: (context, state) {
-                    if (state is GetUserLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is GetUserSuccess) {
-                      MoneyFormatter allowance =
-                          MoneyFormatter(amount: state.user.currentAllowance);
-                      return _buildAllowanceCard(
-                          context, allowance.output.nonSymbol, date);
-                    }
-                    return _buildAllowanceCard(context, (0.0).toString(), date);
-                  },
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Text(
-                  'Spending',
-                  style: Theme.of(context)
-                      .textTheme
-                      .displayLarge
-                      ?.copyWith(fontSize: 20),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                _buildSpendingSection(context),
-                const SizedBox(
-                  height: 16,
-                ),
-                _buildTrancsactionSection(context),
-                const SizedBox(
-                  height: 100,
-                )
-              ],
+        child: BlocListener<GetUserBloc, GetUserState>(
+          listener: (context, state) {
+            if (state is GetUserSuccess) {
+              _loadData();
+            }
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlocBuilder<GetUserBloc, GetUserState>(
+                    builder: (context, state) {
+                      if (state is GetUserLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is GetUserSuccess) {
+                        return _buildHeader(context, state.user.name);
+                      }
+
+                      return _buildHeader(context, '');
+                    },
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  BlocBuilder<GetUserBloc, GetUserState>(
+                    builder: (context, state) {
+                      if (state is GetUserLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (state is GetUserSuccess) {
+                        log('HomeScreen: Rebuilding with user information - ${state.user}');
+                        return _buildAllowanceCard(
+                            context, state.user.currentAllowance, date);
+                      }
+                      return _buildAllowanceCard(context, 0.0, date);
+                    },
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    'Spending',
+                    style: Theme.of(context)
+                        .textTheme
+                        .displayLarge
+                        ?.copyWith(fontSize: 20),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  _buildSpendingSection(context),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  _buildTrancsactionSection(context),
+                  const SizedBox(
+                    height: 100,
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -119,7 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAllowanceCard(
-      BuildContext context, String currentAllowance, String date) {
+      BuildContext context, double currentAllowance, String date) {
+    MoneyFormatter allowanceRemaining =
+        MoneyFormatter(amount: currentAllowance);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
@@ -161,17 +186,28 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 width: 4,
               ),
-              Text(
-                _showCurrentAllowance
-                    ? currentAllowance.toString()
-                    : currentAllowance
-                        .toString()
-                        .replaceAll(RegExp(r"[^,.]"), "•"),
-                style: Theme.of(context)
-                    .textTheme
-                    .displayLarge
-                    ?.copyWith(fontSize: 32),
-              )
+              _showCurrentAllowance
+                  ? Text(
+                      allowanceRemaining.output.nonSymbol.toString(),
+                      style: currentAllowance > 0
+                          ? Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(fontSize: 32)
+                          : Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(fontSize: 32, color: MyColors.red),
+                    )
+                  : Text(
+                      allowanceRemaining.output.nonSymbol
+                          .toString()
+                          .replaceAll(RegExp(r"[^,.]"), "•"),
+                      style: Theme.of(context)
+                          .textTheme
+                          .displayLarge
+                          ?.copyWith(fontSize: 32),
+                    )
             ],
           ),
           const SizedBox(

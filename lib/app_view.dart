@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
+import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
 import 'package:uangin/features/onBoarding/views/on_boarding_screen.dart';
 import 'package:uangin/features/onBoarding/views/splash_screen.dart';
@@ -16,6 +17,7 @@ class MyAppView extends StatefulWidget {
 
 class _MyAppViewState extends State<MyAppView> {
   bool _splashScren = true;
+  bool _getUserTriggerd = false;
 
   @override
   void initState() {
@@ -36,21 +38,30 @@ class _MyAppViewState extends State<MyAppView> {
         title: 'Uangin',
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
-        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-            builder: (context, state) {
-          if (_splashScren) {
-            return const SplashScreen();
-          }
+        home: BlocListener<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            if (state.status == AuthenticationStatus.authenticated &&
+                !_getUserTriggerd) {
+              context.read<GetUserBloc>().add(const GetUser());
+              _getUserTriggerd = true;
+            }
+          },
+          child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, state) {
+            if (_splashScren) {
+              return const SplashScreen();
+            }
 
-          if (state.status == AuthenticationStatus.authenticated) {
-            return const MainScaffold();
-          }
+            if (state.status == AuthenticationStatus.authenticated) {
+              return const MainScaffold();
+            }
 
-          if(state.status == AuthenticationStatus.unauthenticated){
-            return const AuthScreen();
-          }
+            if (state.status == AuthenticationStatus.unauthenticated) {
+              return const AuthScreen();
+            }
 
-          return const OnBoardingScreen();
-        }));
+            return const OnBoardingScreen();
+          }),
+        ));
   }
 }

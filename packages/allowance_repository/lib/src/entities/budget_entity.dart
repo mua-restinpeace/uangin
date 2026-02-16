@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class BudgetEntity {
   String budgetId;
   String userId;
@@ -7,8 +9,8 @@ class BudgetEntity {
   double allocatedAmount;
   double spentAmount;
   bool isActive;
-  DateTime? periodStart;
-  DateTime? periodEnd;
+  DateTime periodStart;
+  DateTime periodEnd;
 
   BudgetEntity(
       {required this.budgetId,
@@ -32,8 +34,8 @@ class BudgetEntity {
       'allocatedAmount': allocatedAmount,
       'spentAmount': spentAmount,
       'isActive': isActive,
-      'periodStart': periodStart,
-      'periodEnd': periodEnd,
+      'periodStart': Timestamp.fromDate(periodStart),
+      'periodEnd': Timestamp.fromDate(periodEnd),
     };
   }
 
@@ -46,8 +48,8 @@ class BudgetEntity {
         color: doc['color'] as String,
         allocatedAmount: (doc['allocatedAmount'] as num).toDouble(),
         spentAmount: (doc['spentAmount'] as num).toDouble(),
-        periodStart: DateTime.fromMillisecondsSinceEpoch(doc['periodStart'] as int),
-        periodEnd: DateTime.fromMillisecondsSinceEpoch(doc['periodEnd'] as int),
+        periodStart: (doc['periodStart'] as Timestamp).toDate(),
+        periodEnd: (doc['periodEnd'] as Timestamp).toDate(),
         isActive: doc['isActive'] as bool? ?? true);
   }
 }
