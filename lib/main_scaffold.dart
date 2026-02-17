@@ -1,6 +1,7 @@
 import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/bottom_navigation/custom_bottom_navigator.dart';
 import 'package:uangin/features/add_expense/views/add_expense_screen.dart';
@@ -20,9 +21,17 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          GetRecentTransactionsBloc(context.read<AllowanceRepository>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              GetRecentTransactionsBloc(context.read<AllowanceRepository>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              DeleteTransactionBloc(context.read<AllowanceRepository>()),
+        ),
+      ],
       child: Scaffold(
         body: Stack(
           children: [

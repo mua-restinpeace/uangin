@@ -41,6 +41,8 @@ dependencies:
   money_formatter:
   intl:
   rxdart: 
+  flutter_slidable: 
+  currency_text_input_formatter: 
 
   user_repository:
     path: packages/user_repository
@@ -110,6 +112,7 @@ flutter:
     - lib/assets/icons/nav_plus.svg
     - lib/assets/icons/arrow_left.svg
     - lib/assets/icons/card.svg
+    - lib/assets/icons/trash.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

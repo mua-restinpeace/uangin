@@ -1,14 +1,17 @@
 import 'dart:developer';
 
+import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
+import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
+import 'package:uangin/core/widgets/transaction_item/transaction_item.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -206,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   : Text(
                       allowanceRemaining.output.nonSymbol
                           .toString()
+                          .replaceAll('-', '')
                           .replaceAll(RegExp(r"[^,.]"), "•"),
                       style: Theme.of(context)
                           .textTheme
@@ -428,115 +432,83 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recent Transaction',
-                  style: Theme.of(context)
-                      .textTheme
-                      .displayMedium
-                      ?.copyWith(fontSize: 16),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'See All',
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontSize: 16, color: const Color(0xff8DAC4A)),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            BlocBuilder<GetRecentTransactionsBloc, GetRecentTransactionsState>(
-                builder: (context, state) {
-              if (state is GetRecentTransactionsFailure) {
-                return Center(
-                  child: Text(
-                    'Error loading recent transactions.',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recent Transaction',
                     style: Theme.of(context)
                         .textTheme
                         .displayMedium
-                        ?.copyWith(fontSize: 18),
+                        ?.copyWith(fontSize: 16),
                   ),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'See All',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          fontSize: 16, color: const Color(0xff8DAC4A)),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              BlocBuilder<GetRecentTransactionsBloc, GetRecentTransactionsState>(
+                  builder: (context, state) {
+                if (state is GetRecentTransactionsFailure) {
+                  return Center(
+                    child: Text(
+                      'Error loading recent transactions.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .displayMedium
+                          ?.copyWith(fontSize: 18),
+                    ),
+                  );
+                } else if (state is GetRecentTransactionsSuccess) {
+                  return _buildTransactionList(context, state.transactionList);
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
-              } else if (state is GetRecentTransactionsSuccess) {
-                return ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: state.transactionList.length,
-                  separatorBuilder: (context, index) => const Divider(
-                    color: MyColors.lightGrey,
-                    thickness: 1,
-                    height: 24,
-                  ),
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(int.parse(
-                                  '0xFF${state.transactionList[index].budgetColor.replaceAll('#', '')}'))),
-                          child: SvgPicture.asset(
-                            state.transactionList[index].budgetIcon,
-                            height: 24,
-                            width: 24,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                state.transactionList[index].description ??
-                                    state.transactionList[index].budgetName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge
-                                    ?.copyWith(fontSize: 16),
-                              ),
-                              Text(
-                                state.transactionList[index].date != null
-                                    ? DateFormat('EEE, dd MMMM yyyy').format(
-                                        state.transactionList[index].date!)
-                                    : 'N/A',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(fontSize: 14),
-                              )
-                            ],
-                          ),
-                        ),
-                        Text(
-                          'IDR ${MoneyFormatter(amount: state.transactionList[index].amount).output.nonSymbol}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(fontSize: 16),
-                        )
-                      ],
-                    );
-                  },
-                );
-              }
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            })
-          ],
+              })
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTransactionList(
+      BuildContext context, List<Transactions> transactions) {
+    return ListView.separated(
+      shrinkWrap: true,
+      itemCount: transactions.length,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      separatorBuilder: (context, index) => const Divider(
+        color: MyColors.lightGrey,
+        thickness: 1,
+        height: 24,
+      ),
+      itemBuilder: (context, index) {
+        final transaction = transactions[index];
+        return TransactionItem(
+          transactions: transaction,
+          budgetList: [],
+          onDelete: () {
+            context.read<DeleteTransactionBloc>().add(DeleteTransaction(
+                transaction.userId, transaction.transactionId));
+          },
+          onEdited: (updatedTransaction) {},
+        );
+      },
     );
   }
 }
