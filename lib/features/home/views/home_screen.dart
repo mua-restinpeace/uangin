@@ -9,6 +9,7 @@ import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
+import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,8 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadData() {
     final userState = context.read<GetUserBloc>().state;
     if (userState is GetUserSuccess) {
-      // todo
-      // reload data with context
+      final userId = userState.user.userId;
+
+      context
+          .read<GetRecentTransactionsBloc>()
+          .add(GetRecentTransactions(userId));
     }
   }
 
@@ -449,63 +453,87 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 16,
             ),
-            ListView.separated(
-              shrinkWrap: true,
-              itemCount: 6,
-              separatorBuilder: (context, index) => const Divider(
-                color: MyColors.lightGrey,
-                thickness: 1,
-                height: 24,
-              ),
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: MyColors.lightOrange),
-                      child: SvgPicture.asset(
-                        'lib/assets/icons/knife_fork.svg',
-                        height: 24,
-                        width: 24,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 12,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Food & Drinks',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayLarge
-                                ?.copyWith(fontSize: 16),
-                          ),
-                          Text(
-                            '8th January 2026',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontSize: 14),
-                          )
-                        ],
-                      ),
-                    ),
-                    Text(
-                      'IDR 12.000',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayLarge
-                          ?.copyWith(fontSize: 16),
-                    )
-                  ],
+            BlocBuilder<GetRecentTransactionsBloc, GetRecentTransactionsState>(
+                builder: (context, state) {
+              if (state is GetRecentTransactionsFailure) {
+                return Center(
+                  child: Text(
+                    'Error loading recent transactions.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .displayMedium
+                        ?.copyWith(fontSize: 18),
+                  ),
                 );
-              },
-            )
+              } else if (state is GetRecentTransactionsSuccess) {
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: state.transactionList.length,
+                  separatorBuilder: (context, index) => const Divider(
+                    color: MyColors.lightGrey,
+                    thickness: 1,
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(int.parse(
+                                  '0xFF${state.transactionList[index].budgetColor.replaceAll('#', '')}'))),
+                          child: SvgPicture.asset(
+                            state.transactionList[index].budgetIcon,
+                            height: 24,
+                            width: 24,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                state.transactionList[index].description ??
+                                    state.transactionList[index].budgetName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(fontSize: 16),
+                              ),
+                              Text(
+                                state.transactionList[index].date != null
+                                    ? DateFormat('EEE, dd MMMM yyyy').format(
+                                        state.transactionList[index].date!)
+                                    : 'N/A',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(fontSize: 14),
+                              )
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'IDR ${MoneyFormatter(amount: state.transactionList[index].amount).output.nonSymbol}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(fontSize: 16),
+                        )
+                      ],
+                    );
+                  },
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            })
           ],
         ),
       ),
