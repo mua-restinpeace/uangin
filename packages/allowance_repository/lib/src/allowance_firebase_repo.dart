@@ -326,8 +326,8 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         .collection('users')
         .doc(userId)
         .collection('transactions')
-        .where('date', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch)
-        .where('date', isLessThanOrEqualTo: endDate.millisecondsSinceEpoch)
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .orderBy('date', descending: true)
         .snapshots()
         .map((snapshot) {
