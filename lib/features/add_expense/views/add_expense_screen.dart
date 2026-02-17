@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:allowance_repository/allowance_repository.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -465,6 +466,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                         Flexible(
                           child: IntrinsicWidth(
                             child: TextFormField(
+                              inputFormatters: [
+                                CurrencyTextInputFormatter.currency(
+                                  symbol: '',
+                                  decimalDigits: 0,
+                                )
+                              ],
                               controller: _amountController,
                               cursorColor: MyColors.black,
                               textAlign: TextAlign.center,
@@ -624,7 +631,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         return;
       }
 
-      final amount = double.tryParse(_amountController.text);
+      final rawAmount = _amountController.text
+          .replaceAll('.', '')
+          .replaceAll(',', '')
+          .replaceAll(' ', '')
+          .trim();
+
+      final amount = double.tryParse(rawAmount);
       if (amount == null || amount <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Please enter a valid amount')));
