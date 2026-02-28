@@ -1,13 +1,8 @@
-import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
-import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
-import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/bottom_navigation/custom_bottom_navigator.dart';
 import 'package:uangin/features/add_expense/views/add_expense_screen.dart';
-import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/home/views/home_screen.dart';
 import 'package:uangin/features/profile/views/profile_screen.dart';
 
@@ -23,63 +18,45 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-                BlocProvider(
-            create: (context) =>
-                GetBudgetsBloc(context.read<AllowanceRepository>())),
-        BlocProvider(
-            create: (context) =>
-                UpdateTransactionBloc(context.read<AllowanceRepository>())),
-        BlocProvider(
-          create: (context) =>
-              GetRecentTransactionsBloc(context.read<AllowanceRepository>()),
-        ),
-        BlocProvider(
-          create: (context) =>
-              DeleteTransactionBloc(context.read<AllowanceRepository>()),
-        ),
-      ],
-      child: Scaffold(
-        body: Stack(
-          children: [
-            IndexedStack(
-              index: _selectedIndex,
-              children: const [HomeScreen(), ProfileScreen()],
+    return Scaffold(
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _selectedIndex,
+            children: const [HomeScreen(), ProfileScreen()],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: BlocBuilder<GetUserBloc, GetUserState>(
+              builder: (context, state) {
+                return CustomBottomNavigator(
+                  selectedIndex: _selectedIndex,
+                  onIndexChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  onAddTap: () {
+                    if (state is GetUserSuccess) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddExpenseScreen(
+                              userId: state.user.userId,
+                            ),
+                          ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Please wait, loading user data...')));
+                    }
+                  },
+                );
+              },
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: BlocBuilder<GetUserBloc, GetUserState>(
-                builder: (context, state) {
-                  return CustomBottomNavigator(
-                    selectedIndex: _selectedIndex,
-                    onIndexChanged: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    onAddTap: () {
-                      if (state is GetUserSuccess) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddExpenseScreen(
-                                userId: state.user.userId,
-                              ),
-                            ));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    Text('Please wait, loading user data...')));
-                      }
-                    },
-                  );
-                },
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

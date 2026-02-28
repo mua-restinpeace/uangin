@@ -225,6 +225,7 @@ class _EditTransactionBottomSheetState
                 } else if (double.tryParse(val) == null) {
                   return 'Pleae enter a valid amount';
                 }
+                return null;
               },
             ),
           )

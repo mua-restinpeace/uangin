@@ -123,6 +123,8 @@ flutter:
     - lib/assets/icons/trash.svg
     - lib/assets/icons/calender.svg
     - lib/assets/icons/cevron.svg
+    - lib/assets/icons/cevron-down.svg
+    - lib/assets/icons/empty-list.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
