@@ -5,12 +5,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
-import 'package:uangin/core/widgets/transaction_item/edit_transaction_bottom_sheet.dart';
+import 'package:uangin/core/widgets/transaction/edit_transaction_bottom_sheet.dart';
 
 class TransactionItem extends StatefulWidget {
   final Transactions transactions;
   final List<Budgets> budgetList;
   final VoidCallback onDelete;
+  final String? dateFormat;
   final Function(Transactions) onEdited;
 
   const TransactionItem(
@@ -18,6 +19,7 @@ class TransactionItem extends StatefulWidget {
       required this.budgetList,
       required this.onDelete,
       required this.onEdited,
+      this.dateFormat,
       super.key});
 
   @override
@@ -103,7 +105,7 @@ class _TransactionItemState extends State<TransactionItem> {
               ),
               Text(
                 widget.transactions.date != null
-                    ? DateFormat('EEE, dd MMMM yyyy')
+                    ? DateFormat(widget.dateFormat ?? 'EEE, dd MMMM yyyy')
                         .format(widget.transactions.date!)
                     : 'N/A',
                 style: Theme.of(context)

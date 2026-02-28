@@ -13,8 +13,9 @@ import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
-import 'package:uangin/core/widgets/transaction_item/transaction_item.dart';
+import 'package:uangin/core/widgets/transaction/transaction_item.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
+import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -451,7 +452,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         ?.copyWith(fontSize: 16),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final userState = context.read<GetUserBloc>().state;
+                      if (userState is GetUserSuccess) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransactionRecordsScreen(
+                                  userId: userState.user.userId),
+                            ));
+                      }
+                    },
                     child: Text(
                       'See All',
                       style: Theme.of(context).textTheme.displayLarge?.copyWith(
