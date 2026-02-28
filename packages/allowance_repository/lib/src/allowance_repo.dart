@@ -48,6 +48,12 @@ abstract class AllowanceRepository {
       TransactionType type = TransactionType.expense,
       String? description});
 
+  Future<void> updateTransaction({
+    required Transactions updatedTransaction,
+    required String originalBudgetId,
+    required double originalAmount
+  });
+
   Stream<List<Transactions>> getTransactions(String userId);
 
   Stream<List<Transactions>> getTransactionByDateRange(

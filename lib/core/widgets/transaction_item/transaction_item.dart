@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
+import 'package:uangin/core/widgets/transaction_item/edit_transaction_bottom_sheet.dart';
 
 class TransactionItem extends StatefulWidget {
   final Transactions transactions;
@@ -65,7 +66,7 @@ class _TransactionItemState extends State<TransactionItem> {
         ],
       ),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => _showEditBottomSheet(context),
         child: _buildTransactionRow(context),
       ),
     );
@@ -137,7 +138,7 @@ class _TransactionItemState extends State<TransactionItem> {
         ),
         content: Text(
           'Are you sure you want to delete this transaction? This will also update your budget and allowance.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -147,7 +148,7 @@ class _TransactionItemState extends State<TransactionItem> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(fontSize: 14),
+                  ?.copyWith(fontSize: 16),
             ),
           ),
           TextButton(
@@ -157,11 +158,28 @@ class _TransactionItemState extends State<TransactionItem> {
               style: Theme.of(context)
                   .textTheme
                   .displayMedium
-                  ?.copyWith(fontSize: 14),
+                  ?.copyWith(fontSize: 16),
             ),
           )
         ],
       ),
+    );
+  }
+
+  void _showEditBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalBottomSheetContext) {
+        return EditTransactionBottomSheet(
+          transactions: widget.transactions,
+          budgetList: widget.budgetList,
+          onSaved: (updatedTransaction) {
+            widget.onEdited(updatedTransaction);
+          },
+        );
+      },
     );
   }
 }

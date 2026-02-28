@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
+import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
@@ -35,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final userState = context.read<GetUserBloc>().state;
     if (userState is GetUserSuccess) {
       final userId = userState.user.userId;
+
+      context.read<GetBudgetsBloc>().add(GetBudgets(userId));
 
       context
           .read<GetRecentTransactionsBloc>()
@@ -459,25 +463,50 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 16,
               ),
-              BlocBuilder<GetRecentTransactionsBloc, GetRecentTransactionsState>(
-                  builder: (context, state) {
-                if (state is GetRecentTransactionsFailure) {
-                  return Center(
-                    child: Text(
-                      'Error loading recent transactions.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayMedium
-                          ?.copyWith(fontSize: 18),
-                    ),
+              BlocBuilder<GetBudgetsBloc, GetBudgetsState>(
+                builder: (context, state) {
+                  if (state is GetBudgetsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is GetBudgetsSuccess) {
+                    final budgetList = state.budgetList;
+
+                    return BlocBuilder<GetRecentTransactionsBloc,
+                        GetRecentTransactionsState>(builder: (context, state) {
+                      if (state is GetRecentTransactionsFailure) {
+                        return Center(
+                          child: Text(
+                            'Error loading recent transactions.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayMedium
+                                ?.copyWith(fontSize: 18),
+                          ),
+                        );
+                      } else if (state is GetRecentTransactionsSuccess) {
+                        return _buildTransactionList(
+                            context, state.transactionList, budgetList);
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    });
+                  }
+
+                  if (state is GetBudgetsFailure) {
+                    log("get budget failed: ${state.errorMsg}");
+                    return Center(
+                      child: Text("Failed to fectch budgets"),
+                    );
+                  }
+
+                  log("get budget return null");
+                  return const SizedBox(
+                    height: 56,
                   );
-                } else if (state is GetRecentTransactionsSuccess) {
-                  return _buildTransactionList(context, state.transactionList);
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              })
+                },
+              )
             ],
           ),
         ),
@@ -485,8 +514,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTransactionList(
-      BuildContext context, List<Transactions> transactions) {
+  Widget _buildTransactionList(BuildContext context,
+      List<Transactions> transactions, List<Budgets> budgets) {
     return ListView.separated(
       shrinkWrap: true,
       itemCount: transactions.length,
@@ -501,12 +530,16 @@ class _HomeScreenState extends State<HomeScreen> {
         final transaction = transactions[index];
         return TransactionItem(
           transactions: transaction,
-          budgetList: [],
+          budgetList: budgets,
           onDelete: () {
             context.read<DeleteTransactionBloc>().add(DeleteTransaction(
                 transaction.userId, transaction.transactionId));
           },
-          onEdited: (updatedTransaction) {},
+          onEdited: (updatedTransaction) {
+            log('updating transaction: $updatedTransaction');
+            context.read<UpdateTransactionBloc>().add(UpdateTransaction(
+                updatedTransaction, transaction.amount, transaction.budgetId));
+          },
         );
       },
     );

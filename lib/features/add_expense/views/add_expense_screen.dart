@@ -9,7 +9,7 @@ import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/long_button.dart';
 import 'package:uangin/features/add_expense/bloc/add_expense/add_expense_bloc.dart';
-import 'package:uangin/features/add_expense/bloc/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 
 class AddExpenseScreen extends StatefulWidget {

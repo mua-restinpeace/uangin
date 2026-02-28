@@ -2,6 +2,8 @@ import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
+import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/bottom_navigation/custom_bottom_navigator.dart';
 import 'package:uangin/features/add_expense/views/add_expense_screen.dart';
@@ -23,6 +25,12 @@ class _MainScaffoldState extends State<MainScaffold> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+                BlocProvider(
+            create: (context) =>
+                GetBudgetsBloc(context.read<AllowanceRepository>())),
+        BlocProvider(
+            create: (context) =>
+                UpdateTransactionBloc(context.read<AllowanceRepository>())),
         BlocProvider(
           create: (context) =>
               GetRecentTransactionsBloc(context.read<AllowanceRepository>()),

@@ -43,6 +43,7 @@ dependencies:
   rxdart: 
   flutter_slidable: 
   currency_text_input_formatter: 
+  flutter_launcher_icons:
 
   user_repository:
     path: packages/user_repository
@@ -54,6 +55,13 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/icons/uangin_logo.png"
+  adaptive_icon_background: "#C9F56A" 
+  adaptive_icon_foreground: "lib/assets/icons/uangin_logo_transparant.png"  #
 
 dev_dependencies:
   flutter_test:
@@ -113,6 +121,8 @@ flutter:
     - lib/assets/icons/arrow_left.svg
     - lib/assets/icons/card.svg
     - lib/assets/icons/trash.svg
+    - lib/assets/icons/calender.svg
+    - lib/assets/icons/cevron.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
