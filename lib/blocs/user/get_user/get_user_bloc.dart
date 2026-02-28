@@ -20,27 +20,6 @@ class GetUserBloc extends Bloc<GetUserEvent, GetUserState> {
 
   GetUserBloc(this._authenticationBloc, this._userRepository)
       : super(GetUserInitial()) {
-    // on<GetUser>((event, emit) async {
-    //   emit(GetUserLoading());
-    //   try {
-    //     await _authSubscription?.cancel();
-
-    //     _authSubscription = _authenticationBloc.stream
-    //         .startWith(_authenticationBloc.state)
-    //         .listen((authState) {
-    //       if (authState.status == AuthenticationStatus.authenticated &&
-    //           authState.user != null) {
-    //         add(GetUserUpdated(authState.user!));
-    //       } else {
-    //         add(const GetUserUpdated(null));
-    //       }
-    //     });
-    //   } catch (e) {
-    //     log('error in GetUser: $e');
-    //     emit(GetUserFailure());
-    //   }
-    // });
-
     on<GetUser>(
       (event, emit) async {
         emit(GetUserLoading());

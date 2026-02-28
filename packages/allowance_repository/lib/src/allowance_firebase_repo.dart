@@ -269,16 +269,17 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           .doc();
 
       final transaction = Transactions(
-          transactionId: docRef.id,
-          userId: userId,
-          budgetId: budgetId,
-          budgetName: budgetName,
-          budgetIcon: budgetIcon,
-          budgetColor: budgetColor,
-          amount: amount,
-          date: date,
-          description: description,
-          type: type,);
+        transactionId: docRef.id,
+        userId: userId,
+        budgetId: budgetId,
+        budgetName: budgetName,
+        budgetIcon: budgetIcon,
+        budgetColor: budgetColor,
+        amount: amount,
+        date: date,
+        description: description,
+        type: type,
+      );
 
       final batch = _firestore.batch();
 
@@ -300,6 +301,64 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
       return transaction;
     } catch (e) {
       log('error adding transaction: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateTransaction(
+      {required Transactions updatedTransaction,
+      required String originalBudgetId,
+      required double originalAmount}) async {
+    try {
+      final batch = _firestore.batch();
+      final amountDiff = updatedTransaction.amount - originalAmount;
+      final budgetChanged = updatedTransaction.budgetId != originalBudgetId;
+
+      final transactionRef = _firestore
+          .collection('users')
+          .doc(updatedTransaction.userId)
+          .collection('transactions')
+          .doc(updatedTransaction.transactionId);
+      batch.update(transactionRef, updatedTransaction.toEntity().toJSON());
+
+      if (budgetChanged) {
+        final originalBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(originalBudgetId);
+        batch.update(originalBudgetRef,
+            {'spentAmount': FieldValue.increment(-originalAmount)});
+
+        final newBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(updatedTransaction.budgetId);
+        batch.update(newBudgetRef,
+            {'spentAmount': FieldValue.increment(updatedTransaction.amount)});
+      } else if (amountDiff != 0) {
+        final updatedBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(updatedTransaction.budgetId);
+        batch.update(updatedBudgetRef,
+            {'spentAmount': FieldValue.increment(amountDiff)});
+      }
+
+      if (amountDiff != 0) {
+        final updatedUserRef =
+            _firestore.collection('users').doc(updatedTransaction.userId);
+        batch.update(updatedUserRef,
+            {'currentAllowance': FieldValue.increment(-amountDiff)});
+      }
+
+      await batch.commit();
+      log('Transaction updated: $updatedTransaction');
+    } catch (e) {
+      log('Error update transaction: $e');
       rethrow;
     }
   }
@@ -394,6 +453,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
     }
   }
 
+  // saving goals operations
   @override
   Future<SavingGoals> createdSavingGoal(
       {required String userId,

@@ -26,7 +26,7 @@ class GetBudgetsBloc extends Bloc<GetBudgetsEvent, GetBudgetsState> {
         );
       } catch (e) {
         log('error getting budgets: $e');
-        emit(GetBudgetsFailure());
+        emit(GetBudgetsFailure(e.toString()));
       }
     });
 
