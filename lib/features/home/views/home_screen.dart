@@ -14,6 +14,7 @@ import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
+import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
@@ -230,7 +231,14 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MyButton(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddAllowanceScreen(),
+                    ),
+                  );
+                },
                 content: Row(
                   children: [
                     SvgPicture.asset(
