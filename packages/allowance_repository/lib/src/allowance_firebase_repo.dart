@@ -77,10 +77,14 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   Future<Allowances> addAllowance(
       {required String userId,
       required double amount,
-      double savedAmount = 0.0,
+      required double currentAllowance,
+      required bool addToSaving,
       required DateTime date,
       String? notes}) async {
     try {
+      final batch = _firestore.batch();
+
+      // create allowance
       final docRef = _firestore
           .collection('users')
           .doc(userId)
@@ -91,18 +95,28 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           allowanceId: docRef.id,
           userId: userId,
           amount: amount,
-          savedAmount: savedAmount,
+          savedAmount: addToSaving ? currentAllowance : 0.0,
           date: date,
           notes: notes);
+      batch.set(docRef, allowance.toEnity().toJSON());
 
-      await docRef.set(allowance.toEnity().toJSON());
+      // update user allowance
+      final userRef = _firestore.collection('users').doc(userId);
 
-      await _updateUserAllowance(userId, amount + savedAmount);
+      if (addToSaving) {
+        batch.update(userRef, {
+          'currentAllowance': amount,
+          'totalSaving': FieldValue.increment(currentAllowance),
+          'lastAllowanceDate': Timestamp.fromDate(date)
+        });
+      } else {
+        batch.update(userRef, {
+          'currentAllowance': FieldValue.increment(amount),
+          'lastAllowanceDate': Timestamp.fromDate(date)
+        });
+      }
 
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .update({'lastAllowanceDate': date.millisecondsSinceEpoch});
+      await batch.commit();
 
       log('allowance added: ${allowance.allowanceId}');
       return allowance;

@@ -14,6 +14,7 @@ import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
+import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
@@ -27,6 +28,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String date = DateFormat('EEE, dd MMMM yyyy').format(DateTime.now());
   bool _showCurrentAllowance = false;
+  late String _userId;
 
   @override
   void initState() {
@@ -37,13 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadData() {
     final userState = context.read<GetUserBloc>().state;
     if (userState is GetUserSuccess) {
-      final userId = userState.user.userId;
+      setState(() {
+        _userId = userState.user.userId;
+      });
 
-      context.read<GetBudgetsBloc>().add(GetBudgets(userId));
+      context.read<GetBudgetsBloc>().add(GetBudgets(_userId));
 
       context
           .read<GetRecentTransactionsBloc>()
-          .add(GetRecentTransactions(userId));
+          .add(GetRecentTransactions(_userId));
     }
   }
 
@@ -230,7 +234,17 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MyButton(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddAllowanceScreen(
+                        currentAllowance: currentAllowance,
+                        userId: _userId,
+                      ),
+                    ),
+                  );
+                },
                 content: Row(
                   children: [
                     SvgPicture.asset(

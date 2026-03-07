@@ -9,7 +9,9 @@ abstract class AllowanceRepository {
   Future<Allowances> addAllowance(
       {required String userId,
       required double amount,
-      double savedAmount,
+      required double currentAllowance,
+      // double savedAmount,
+      required bool addToSaving,
       required DateTime date,
       String? notes});
   Stream<List<Allowances>> getAllowances(String userId);
