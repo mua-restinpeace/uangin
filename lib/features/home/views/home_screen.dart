@@ -28,6 +28,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String date = DateFormat('EEE, dd MMMM yyyy').format(DateTime.now());
   bool _showCurrentAllowance = false;
+  late String _userId;
 
   @override
   void initState() {
@@ -38,13 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadData() {
     final userState = context.read<GetUserBloc>().state;
     if (userState is GetUserSuccess) {
-      final userId = userState.user.userId;
+      setState(() {
+        _userId = userState.user.userId;
+      });
 
-      context.read<GetBudgetsBloc>().add(GetBudgets(userId));
+      context.read<GetBudgetsBloc>().add(GetBudgets(_userId));
 
       context
           .read<GetRecentTransactionsBloc>()
-          .add(GetRecentTransactions(userId));
+          .add(GetRecentTransactions(_userId));
     }
   }
 
@@ -235,7 +238,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const AddAllowanceScreen(),
+                      builder: (context) => AddAllowanceScreen(
+                        currentAllowance: currentAllowance,
+                        userId: _userId,
+                      ),
                     ),
                   );
                 },

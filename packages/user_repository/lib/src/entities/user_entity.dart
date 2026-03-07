@@ -3,6 +3,7 @@ class UserEntity {
   String name;
   String email;
   double currentAllowance;
+  double totalSaving;
   DateTime? lastAllowanceDate;
   int goalsAchieved;
 
@@ -11,6 +12,7 @@ class UserEntity {
       required this.name,
       required this.email,
       this.currentAllowance = 0.0,
+      this.totalSaving = 0.0,
       this.lastAllowanceDate,
       required this.goalsAchieved});
 
@@ -20,6 +22,7 @@ class UserEntity {
       'name': name,
       'email': email,
       'currentAllowance': currentAllowance,
+      'totalSaving': totalSaving,
       'lastAllowanceDate': lastAllowanceDate?.millisecondsSinceEpoch,
       'goalsAchieved': goalsAchieved
     };
@@ -31,6 +34,7 @@ class UserEntity {
         name: (doc['name'] as String),
         email: (doc['email'] as String),
         currentAllowance: (doc['currentAllowance'] as num?)?.toDouble() ?? 0.0,
+        totalSaving: (doc['totalSaving'] as num?)?.toDouble() ?? 0.0,
         lastAllowanceDate: doc['latestAllowanceDate'] != null
             ? DateTime.fromMillisecondsSinceEpoch(
                 doc['lastAllowanceDate'] as int)

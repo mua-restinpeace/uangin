@@ -1,14 +1,22 @@
 import 'dart:ui';
 
+import 'package:allowance_repository/allowance_repository.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/animated_circle.dart';
 import 'package:uangin/core/widgets/long_button.dart';
+import 'package:uangin/features/add_allowance/blocs/add_allowance/add_allowance_bloc.dart';
 
 class AddAllowanceScreen extends StatefulWidget {
-  const AddAllowanceScreen({super.key});
+  final String userId;
+  final double currentAllowance;
+
+  const AddAllowanceScreen(
+      {required this.userId, required this.currentAllowance, super.key});
 
   @override
   State<AddAllowanceScreen> createState() => _AddAllowanceScreenState();
@@ -22,6 +30,30 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+        create: (context) =>
+            AddAllowanceBloc(context.read<AllowanceRepository>()),
+        child: BlocListener<AddAllowanceBloc, AddAllowanceState>(
+          listener: (context, state) {
+            if (state is AddAllowanceSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Allowance added successfully'),
+                backgroundColor: MyColors.green,
+              ));
+              Navigator.pop(context);
+            } else if (state is AddAllowanceFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Failed to add allowance'),
+                backgroundColor: MyColors.red,
+              ));
+            }
+          },
+          child: _buildContent(context, widget.currentAllowance, widget.userId),
+        ));
+  }
+
+  Widget _buildContent(
+      BuildContext context, double currentAllowance, String userId) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
@@ -82,13 +114,28 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        _buildAllowanceRemaining(context, '350.000'),
+                        _buildAllowanceRemaining(
+                          context,
+                          currentAllowance,
+                        ),
                         const Spacer(),
                         _buildFormAddAllowance(),
                         const Spacer(),
-                        LongButton(
-                          text: 'Add Allowance',
-                          onPressed: () {},
+                        BlocBuilder<AddAllowanceBloc, AddAllowanceState>(
+                          builder: (context, state) {
+                            return Builder(builder: (context) {
+                              if(state is AddAllowanceLoading){
+                                return const Center(
+                                  child: CircularProgressIndicator()
+                                );
+                              }
+                              return LongButton(
+                                text: 'Add Allowance',
+                                onPressed: () => _handleAllowanceAdd(
+                                    context, currentAllowance, userId),
+                              );
+                            });
+                          },
                         )
                       ],
                     ),
@@ -103,7 +150,7 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
   }
 
   Widget _buildAllowanceRemaining(
-      BuildContext context, String allowanceRemaining) {
+      BuildContext context, double allowanceRemaining) {
     return Container(
       decoration: BoxDecoration(
         color: MyColors.fillColor,
@@ -149,9 +196,15 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
                         width: 4,
                       ),
                       Text(
-                        allowanceRemaining,
+                        MoneyFormatter(amount: allowanceRemaining)
+                            .output
+                            .nonSymbol,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 18, fontWeight: FontWeight.w600),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: allowanceRemaining < 0.0
+                                ? MyColors.red
+                                : MyColors.onPrimary),
                       )
                     ],
                   ),
@@ -304,5 +357,41 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
         ),
       ],
     );
+  }
+
+  void _handleAllowanceAdd(
+      BuildContext context, double currentAllowance, String userId) {
+    if (_formKey.currentState!.validate()) {
+      final rawAmount = _amountController.text
+          .replaceAll('.', '')
+          .replaceAll(',', '')
+          .replaceAll(' ', '')
+          .trim();
+
+      final amount = double.tryParse(rawAmount);
+
+      if (amount == null || amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a valid amount')));
+        return;
+      }
+
+      if (_addToSaving) {
+        if (currentAllowance <= 0) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("You don't have any leftover allowance to save!"),
+            backgroundColor: MyColors.red,
+          ));
+          return;
+        }
+      }
+
+      context.read<AddAllowanceBloc>().add(AddAllowanceSubmitted(
+          userId: userId,
+          amount: amount,
+          currentAllowance: currentAllowance,
+          addToSaving: _addToSaving,
+          notes: _notesController.text.isEmpty ? null : _notesController.text));
+    }
   }
 }
