@@ -8,12 +8,14 @@ class CustomChart extends StatelessWidget {
   final Map<String, Color> colors;
   final double strokeWidth;
   final double size;
+  final double totalSpent;
 
   const CustomChart(
       {required this.data,
       required this.colors,
       required this.strokeWidth,
       required this.size,
+      required this.totalSpent,
       super.key});
 
   @override
@@ -30,7 +32,7 @@ class CustomChart extends StatelessWidget {
             context: context,
             data: data,
             colors: colors,
-            total: total,
+            total: totalSpent,
             strokeWidth: strokeWidth),
       ),
     );
