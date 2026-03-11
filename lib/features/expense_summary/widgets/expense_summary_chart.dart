@@ -39,7 +39,7 @@ class ExpenseSummaryChart extends StatelessWidget {
                       data: breakdown,
                       colors: colorMap,
                       strokeWidth: 40,
-                      totalSpent: totalSpent,
+                      totalAllocated: 350000,
                       size: MediaQuery.of(context).size.width * 0.6),
                 ),
                 Center(
