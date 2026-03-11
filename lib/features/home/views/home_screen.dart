@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
+import 'package:uangin/blocs/expense_summary/expense_summary_bloc.dart';
 import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
@@ -15,7 +16,10 @@ import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
 import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
+import 'package:uangin/features/expense_summary/views/expense_summary_tab.dart';
+import 'package:uangin/features/expense_summary/views/spending_analysis_screen.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
+import 'package:uangin/features/home/blocs/get_total_spent/get_total_spent_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -306,88 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                  color: MyColors.fillColor,
-                  border: Border.all(color: MyColors.lightGrey),
-                  borderRadius: BorderRadius.circular(20)),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'lib/assets/icons/chart.svg',
-                        width: 20,
-                        height: 20,
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        'Expense Summary',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 16),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'IDR',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(color: MyColors.grey, fontSize: 16),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '350.000',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 16),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        '-IDR 120.000',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(
-                                fontSize: 12, color: const Color(0xff0ACE89)),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '(40% left)',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 12, color: MyColors.red),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  const CustomeLinearProgressBar(
-                    percentage: 0.6,
-                    progressColor: MyColors.orange,
-                  )
-                ],
-              ),
-            ),
+            child: _buildExpenseSummary(context),
           ),
           const SizedBox(
             width: 16,
@@ -559,12 +482,6 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        if (state is ExpenseSummaryFailure) {
-          return Center(
-            child: Text('Error getting expense summary.'),
-          );
-        }
-
         return const SizedBox();
       },
     );
@@ -648,7 +565,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   if (state is GetBudgetsFailure) {
                     log("get budget failed: ${state.errorMsg}");
-                    return Center(
+                    return const Center(
                       child: Text("Failed to fectch budgets"),
                     );
                   }
