@@ -7,11 +7,13 @@ import 'package:uangin/features/expense_summary/widgets/custom_chart.dart';
 class ExpenseSummaryChart extends StatelessWidget {
   final Map<String, double> breakdown;
   final double totalSpent;
+  final double totalAllocated;
   final List<Budgets> budgets;
 
   const ExpenseSummaryChart(
       {required this.breakdown,
       required this.totalSpent,
+      required this.totalAllocated,
       required this.budgets,
       super.key});
 
@@ -39,7 +41,7 @@ class ExpenseSummaryChart extends StatelessWidget {
                       data: breakdown,
                       colors: colorMap,
                       strokeWidth: 40,
-                      totalAllocated: 350000,
+                      totalAllocated: totalAllocated,
                       size: MediaQuery.of(context).size.width * 0.6),
                 ),
                 Center(

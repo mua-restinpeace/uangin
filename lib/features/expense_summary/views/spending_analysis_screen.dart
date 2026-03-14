@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:uangin/blocs/get_total_allocated_budgets/get_total_allocated_budgets_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/features/expense_summary/views/budgets_tab.dart';
 import 'package:uangin/features/expense_summary/views/expense_summary_tab.dart';
@@ -92,20 +94,35 @@ class _SpendingAnalysisScreenState extends State<SpendingAnalysisScreen>
               ),
             ),
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  ExpenseSummaryScreen(
-                    userId: widget.userId,
-                  ),
-                  BudgetsTab()
-                ],
+              child: BlocBuilder<GetTotalAllocatedBudgetsBloc,
+                  GetTotalAllocatedBudgetsState>(
+                builder: (context, state) {
+                  if (state is GetTotalAllocatedBudgetsLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (state is GetTotalAllocatedBudgetsSuccess) {
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        ExpenseSummaryScreen(
+                            userId: widget.userId,
+                            totalAllocated: state.totalAllocated),
+                        BudgetsTab()
+                      ],
+                    );
+                  }
+
+                  return const SizedBox();
+                },
               ),
             )
           ],
         ),
       ),
     );
-    ;
+
   }
 }

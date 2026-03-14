@@ -1,5 +1,4 @@
 import 'package:allowance_repository/allowance_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_formatter/money_formatter.dart';
@@ -10,7 +9,9 @@ import 'package:uangin/features/expense_summary/widgets/expense_summary_chart.da
 
 class ExpenseSummaryScreen extends StatelessWidget {
   final String userId;
-  const ExpenseSummaryScreen({required this.userId, super.key});
+  final double totalAllocated;
+  const ExpenseSummaryScreen(
+      {required this.userId, required this.totalAllocated, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,7 @@ class ExpenseSummaryScreen extends StatelessWidget {
                     ExpenseSummaryChart(
                         breakdown: summaryState.breakdown,
                         totalSpent: summaryState.totalSpent,
+                        totalAllocated: totalAllocated,
                         budgets: budgets),
                     const SizedBox(
                       height: 24,
@@ -42,8 +44,7 @@ class ExpenseSummaryScreen extends StatelessWidget {
                     _buildBreakdown(
                         context: context,
                         breakdown: summaryState.breakdown,
-                        budgets: budgets,
-                        totalAllocated: 350000)
+                        budgets: budgets)
                   ],
                 ),
               );
@@ -65,8 +66,7 @@ class ExpenseSummaryScreen extends StatelessWidget {
   Widget _buildBreakdown(
       {required BuildContext context,
       required List<Budgets> budgets,
-      required Map<String, double> breakdown,
-      required double totalAllocated}) {
+      required Map<String, double> breakdown}) {
     return Container(
       decoration: BoxDecoration(
           color: MyColors.fillColor,
@@ -98,7 +98,7 @@ class ExpenseSummaryScreen extends StatelessWidget {
                   Color(int.parse('0xFF${budget.color.replaceAll('#', '')}'));
               final spentAmount = breakdown[budget.name] ?? 0.0;
               final percentage = (spentAmount / totalAllocated * 100);
-          
+
               return _buildBreakdownItem(
                   context, percentage, budget.name, spentAmount, color);
             },
@@ -113,12 +113,13 @@ class ExpenseSummaryScreen extends StatelessWidget {
     return Row(
       children: [
         Container(
+          width: 72,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Center(
               child: Text(
                 '${percentage.toStringAsFixed(0)}%',

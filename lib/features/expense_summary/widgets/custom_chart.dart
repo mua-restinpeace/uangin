@@ -140,7 +140,7 @@ class _RoundedDonutChartPainter extends CustomPainter {
         ..strokeWidth = strokeWidth;
 
       canvas.drawArc(rect, startAngle, unallocatedSweepAngle, false, paint);
-      final unallocatedPercentage = (unallocated / totalAllocated * 100);
+      // final unallocatedPercentage = (unallocated / totalAllocated * 100);
 
       // if (unallocatedPercentage > 3) {
       //   final textAngle = startAngle + unallocatedSweepAngle / 2;

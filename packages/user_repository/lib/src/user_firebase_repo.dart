@@ -114,7 +114,7 @@ class FirebaseUserRepo implements UserRepository {
           name: 'Groceries',
           icon: 'lib/assets/icons/cart.svg',
           color: '#426FF6',
-          allocatedAmount: 50000,
+          allocatedAmount: 30000,
           periodStart: periodStart,
           periodEnd: periodEnd),
       Budgets(
@@ -123,7 +123,7 @@ class FirebaseUserRepo implements UserRepository {
           name: 'Gyms',
           icon: 'lib/assets/icons/dumbell.svg',
           color: '#C93FFF',
-          allocatedAmount: 0,
+          allocatedAmount: 35000,
           periodStart: periodStart,
           periodEnd: periodEnd),
       Budgets(
@@ -132,7 +132,7 @@ class FirebaseUserRepo implements UserRepository {
           name: 'Transportations',
           icon: 'lib/assets/icons/car.svg',
           color: '#45C296',
-          allocatedAmount: 0,
+          allocatedAmount: 25000,
           periodStart: periodStart,
           periodEnd: periodEnd),
       Budgets(
@@ -141,7 +141,7 @@ class FirebaseUserRepo implements UserRepository {
           name: 'Snacks',
           icon: 'lib/assets/icons/smile_face.svg',
           color: '#F69E09',
-          allocatedAmount: 0,
+          allocatedAmount: 30000,
           periodStart: periodStart,
           periodEnd: periodEnd),
       Budgets(
@@ -150,7 +150,7 @@ class FirebaseUserRepo implements UserRepository {
           name: 'Subscriptions',
           icon: 'lib/assets/icons/tag.svg',
           color: '#FE5D5F',
-          allocatedAmount: 0,
+          allocatedAmount: 25000,
           periodStart: periodStart,
           periodEnd: periodEnd),
       Budgets(

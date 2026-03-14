@@ -90,6 +90,10 @@ abstract class AllowanceRepository {
     DateTime periodStart,
     DateTime periodEnd,
   );
+
+  Stream<double> getTotalAllocatedBudgets(
+    String userId
+  );
   
   Stream<Map<String, double>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd);

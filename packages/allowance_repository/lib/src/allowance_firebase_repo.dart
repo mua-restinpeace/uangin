@@ -630,6 +630,24 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   }
 
   @override
+  Stream<double> getTotalAllocatedBudgets(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('budgets')
+        .snapshots()
+        .map((snapshot) {
+      double totalAllocated = 0.0;
+
+      for (var doc in snapshot.docs) {
+        totalAllocated += (doc.data()['allocatedAmount'] as num).toDouble();
+      }
+
+      return totalAllocated;
+    });
+  }
+
+  @override
   Stream<Map<String, double>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd) {
     try {
