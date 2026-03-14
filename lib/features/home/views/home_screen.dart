@@ -52,14 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
           .read<GetRecentTransactionsBloc>()
           .add(GetRecentTransactions(_userId));
 
-      final now = DateTime.now();
-      final periodStart =
-          DateTime(now.year, now.month, now.day - (now.weekday - 1));
-      final periodEnd = DateTime(
-          now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59, 999);
+      // final now = DateTime.now();
+      // final periodStart =
+      //     DateTime(now.year, now.month, now.day - (now.weekday - 1));
+      // final periodEnd = DateTime(
+      //     now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59, 999);
       context
           .read<ExpenseSummaryBloc>()
-          .add(GetExpenseSummary(_userId, periodStart, periodEnd));
+          .add(GetExpenseSummary(_userId, SummaryFilter.thisWeek));
 
       context
           .read<GetTotalAllocatedBudgetsBloc>()

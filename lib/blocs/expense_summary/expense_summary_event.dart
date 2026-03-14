@@ -9,13 +9,12 @@ sealed class ExpenseSummaryEvent extends Equatable {
 
 class GetExpenseSummary extends ExpenseSummaryEvent {
   final String userId;
-  final DateTime periodStart;
-  final DateTime periodEnd;
+  final SummaryFilter filter;
 
-  const GetExpenseSummary(this.userId, this.periodStart, this.periodEnd);
+  const GetExpenseSummary(this.userId, this.filter);
 
   @override
-  List<Object> get props => [userId, periodStart, periodEnd];
+  List<Object> get props => [userId, filter];
 }
 
 class ExpenseSummaryUpdated extends ExpenseSummaryEvent{
