@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
+import 'package:uangin/blocs/expense_summary/expense_summary_bloc.dart';
 import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/blocs/get_total_allocated_budgets/get_total_allocated_budgets_bloc.dart';
 import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
@@ -59,6 +61,14 @@ class _MyAppViewState extends State<MyAppView> {
         BlocProvider(
           create: (context) =>
               GetFilteredTransactionBloc(context.read<AllowanceRepository>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              ExpenseSummaryBloc(context.read<AllowanceRepository>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              GetTotalAllocatedBudgetsBloc(context.read<AllowanceRepository>()),
         )
       ],
       child: MaterialApp(

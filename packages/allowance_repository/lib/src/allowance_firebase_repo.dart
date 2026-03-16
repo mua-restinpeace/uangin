@@ -601,25 +601,28 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
 
   // analytics & summary operations
   @override
-  Future<double> getTotalSpentThisPeriod(
-      String userId, DateTime periodStart, DateTime periodEnd) async {
+  Stream<double> getTotalSpentThisPeriod(
+      String userId, DateTime periodStart, DateTime periodEnd) {
     try {
-      final snapshot = await _firestore
+      log('getting total spent...');
+      return _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .where('date',
-              isGreaterThanOrEqualTo: periodStart.millisecondsSinceEpoch)
-          .where('date', isLessThanOrEqualTo: periodEnd.millisecondsSinceEpoch)
+              isGreaterThanOrEqualTo: Timestamp.fromDate(periodStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(periodEnd))
           .where('type', isEqualTo: 'expense')
-          .get();
+          .snapshots()
+          .map((snapshot) {
+        double total = 0.0;
+        for (var doc in snapshot.docs) {
+          total += (doc.data()['amount'] as num).toDouble();
+        }
 
-      double total = 0.0;
-      for (var doc in snapshot.docs) {
-        total += (doc.data()['amount'] as num).toDouble();
-      }
-
-      return total;
+        log('getTotalSpentThisPeriod: total spent amount = $total');
+        return total;
+      });
     } catch (e) {
       log('error get total spent amount: $e');
       rethrow;
@@ -627,40 +630,52 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getSpendingBreakdown(
-      String userId, DateTime periodStart, DateTime periodEnd) async {
+  Stream<double> getTotalAllocatedBudgets(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('budgets')
+        .snapshots()
+        .map((snapshot) {
+      double totalAllocated = 0.0;
+
+      for (var doc in snapshot.docs) {
+        totalAllocated += (doc.data()['allocatedAmount'] as num).toDouble();
+      }
+
+      return totalAllocated;
+    });
+  }
+
+  @override
+  Stream<Map<String, double>> getSpendingBreakdown(
+      String userId, DateTime periodStart, DateTime periodEnd) {
     try {
-      final snapshot = await _firestore
+      return _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .where('date',
-              isGreaterThanOrEqualTo: periodStart.millisecondsSinceEpoch)
-          .where('date', isLessThanOrEqualTo: periodEnd.millisecondsSinceEpoch)
+              isGreaterThanOrEqualTo: Timestamp.fromDate(periodStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(periodEnd))
           .where('type', isEqualTo: 'expense')
-          .get();
+          .snapshots()
+          .map((snapshot) {
+        Map<String, double> breakdown = {};
 
-      Map<String, dynamic> breakdown = {};
+        for (var doc in snapshot.docs) {
+          final data = doc.data();
+          final budgetName = data['budgetName'] as String;
+          final amount = (data['amount'] as num).toDouble();
 
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
-        final budgetName = data['budgetName'] as String;
-        final amount = (data['amount'] as num).toDouble();
+          breakdown[budgetName] = (breakdown[budgetName] ?? 0.0) + amount;
+        }
 
-        breakdown[budgetName] = (breakdown[budgetName] ?? 0.0) + amount;
-      }
-
-      return breakdown;
+        return breakdown;
+      });
     } catch (e) {
       log('error getting spending breakdown');
       rethrow;
     }
-  }
-
-  Future<void> _updateUserAllowance(String userId, double amountToAdd) async {
-    await _firestore
-        .collection('users')
-        .doc(userId)
-        .update({'currentAllowance': FieldValue.increment(amountToAdd)});
   }
 }

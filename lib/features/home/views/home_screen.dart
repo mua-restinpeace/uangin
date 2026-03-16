@@ -7,14 +7,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
+import 'package:uangin/blocs/expense_summary/expense_summary_bloc.dart';
 import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/blocs/get_total_allocated_budgets/get_total_allocated_budgets_bloc.dart';
 import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
-import 'package:uangin/core/widgets/custome_linear_progress_bar.dart';
+import 'package:uangin/core/widgets/custom_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
 import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
+import 'package:uangin/features/expense_summary/views/spending_analysis_screen.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
@@ -48,6 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
       context
           .read<GetRecentTransactionsBloc>()
           .add(GetRecentTransactions(_userId));
+
+      context
+          .read<ExpenseSummaryBloc>()
+          .add(GetExpenseSummary(_userId, SummaryFilter.thisWeek));
+
+      context
+          .read<GetTotalAllocatedBudgetsBloc>()
+          .add(GetTotalAllocatedBudgets(_userId));
     }
   }
 
@@ -297,88 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                  color: MyColors.fillColor,
-                  border: Border.all(color: MyColors.lightGrey),
-                  borderRadius: BorderRadius.circular(20)),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'lib/assets/icons/chart.svg',
-                        width: 20,
-                        height: 20,
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        'Expense Summary',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 16),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'IDR',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(color: MyColors.grey, fontSize: 16),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '350.000',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 16),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        '-IDR 120.000',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(
-                                fontSize: 12, color: const Color(0xff0ACE89)),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '(40% left)',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 12, color: MyColors.red),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  const CustomeLinearProgressBar(
-                    percentage: 0.6,
-                    progressColor: MyColors.orange,
-                  )
-                ],
-              ),
-            ),
+            child: _buildExpenseSummary(context),
           ),
           const SizedBox(
             width: 16,
@@ -440,6 +370,148 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildExpenseSummary(BuildContext context) {
+    return BlocBuilder<ExpenseSummaryBloc, ExpenseSummaryState>(
+      builder: (context, summaryState) {
+        if (summaryState is ExpenseSummaryLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (summaryState is ExpenseSummarySuccess) {
+          return BlocBuilder<GetTotalAllocatedBudgetsBloc,
+              GetTotalAllocatedBudgetsState>(
+            builder: (context, allocatedState) {
+              if (allocatedState is GetTotalAllocatedBudgetsLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (allocatedState is GetTotalAllocatedBudgetsSuccess) {
+                var totalAllocated = allocatedState.totalAllocated;
+                final totalSpent = summaryState.totalSpent;
+                final double percentage =
+                    totalAllocated > 0 ? totalSpent / totalAllocated : 0;
+                final spentPercentage =
+                    (100.00 - percentage * 100);
+
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SpendingAnalysisScreen(
+                            userId: _userId,
+                          ),
+                        ));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                        color: MyColors.fillColor,
+                        border: Border.all(color: MyColors.lightGrey),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'lib/assets/icons/chart.svg',
+                              width: 20,
+                              height: 20,
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              'Spending Analysis',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(fontSize: 16),
+                            )
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Total spent this week:',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.copyWith(fontSize: 12),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'IDR',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      color: MyColors.grey, fontSize: 16),
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              MoneyFormatter(amount: totalSpent)
+                                  .output
+                                  .nonSymbol,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(fontSize: 16),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          '(${spentPercentage.toStringAsFixed(0)}% left)',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.copyWith(
+                                  fontSize: 14,
+                                  color: spentPercentage < 50.0
+                                      ? MyColors.red
+                                      : MyColors.green),
+                        ),
+                        const Spacer(),
+                        CustomLinearProgressBar(
+                          percentage: percentage,
+                          progressColor: MyColors.orange,
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              if (allocatedState is GetTotalAllocatedBudgetsFailure) {
+                return const Center(
+                  child: Text('Failed to fetch total allocated budgets.'),
+                );
+              }
+
+              return const SizedBox();
+            },
+          );
+        }
+
+        return const SizedBox();
+      },
     );
   }
 
@@ -521,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   if (state is GetBudgetsFailure) {
                     log("get budget failed: ${state.errorMsg}");
-                    return Center(
+                    return const Center(
                       child: Text("Failed to fectch budgets"),
                     );
                   }

@@ -85,12 +85,16 @@ abstract class AllowanceRepository {
   Future<void> deleteSavingGoal(String userId, String goalId);
 
   // analytics & summary operations
-  Future<double> getTotalSpentThisPeriod(
+  Stream<double> getTotalSpentThisPeriod(
     String userId,
     DateTime periodStart,
     DateTime periodEnd,
   );
+
+  Stream<double> getTotalAllocatedBudgets(
+    String userId
+  );
   
-  Future<Map<String, dynamic>> getSpendingBreakdown(
+  Stream<Map<String, double>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd);
 }
