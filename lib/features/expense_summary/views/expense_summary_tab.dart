@@ -8,7 +8,7 @@ import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/blocs/expense_summary/expense_summary_bloc.dart';
 import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
-import 'package:uangin/features/expense_summary/widgets/expense_summary_chart.dart';
+import 'package:uangin/features/expense_summary/widgets/expense_summary/expense_summary_chart.dart';
 
 class ExpenseSummaryScreen extends StatefulWidget {
   final String userId;

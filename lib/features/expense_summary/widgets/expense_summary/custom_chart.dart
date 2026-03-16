@@ -25,7 +25,7 @@ class CustomChart extends StatefulWidget {
 class _CustomChartState extends State<CustomChart>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late CurvedAnimation curvedAnimation;
+  late CurvedAnimation _curvedAnimation;
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _CustomChartState extends State<CustomChart>
 
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
 
-    curvedAnimation =
+    _curvedAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
     _controller.forward();
   }
@@ -59,7 +59,7 @@ class _CustomChartState extends State<CustomChart>
                 colors: widget.colors,
                 totalAllocated: widget.totalAllocated,
                 strokeWidth: widget.strokeWidth,
-                animationController: curvedAnimation),
+                animationController: _curvedAnimation),
           );
         },
       ),

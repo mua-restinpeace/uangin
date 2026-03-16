@@ -2,7 +2,7 @@ import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
-import 'package:uangin/features/expense_summary/widgets/custom_chart.dart';
+import 'package:uangin/features/expense_summary/widgets/expense_summary/custom_chart.dart';
 
 class ExpenseSummaryChart extends StatelessWidget {
   final Map<String, double> breakdown;

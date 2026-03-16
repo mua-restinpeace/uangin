@@ -144,7 +144,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                           builder: (context, state) {
                             if (state is AddExpenseLoading) {
                               return const Center(
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(color: MyColors.black, strokeCap: StrokeCap.round,),
                               );
                             }
                             return Builder(builder: (context) {
@@ -265,21 +265,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                           color: Color(
                             int.parse(
                                 '0xFF${_selectedBudgets!.color.replaceAll('#', '')}'),
-                          ),
+                          ).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: Color(
                                 int.parse(
                                     '0xFF${_selectedBudgets!.color.replaceAll('#', '')}'),
-                              ),
+                              ).withOpacity(0.2),
                             )
                           ],
                         ),
                         child: SvgPicture.asset(
                           _selectedBudgets!.icon,
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                         ),
                       ),
                       const SizedBox(
@@ -362,7 +362,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                                   ?.copyWith(fontSize: 40),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amunt!';
+                                  return 'Please enter a valid amount!';
                                 }
                                 return null;
                               },
@@ -421,7 +421,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? MyColors.primary : color,
+                color: isSelected ? MyColors.primary : color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SvgPicture.asset(

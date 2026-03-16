@@ -81,7 +81,7 @@ class _TransactionItemState extends State<TransactionItem> {
       children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color.withOpacity(0.2)),
           child: SvgPicture.asset(
             widget.transactions.budgetIcon,
             height: 24,

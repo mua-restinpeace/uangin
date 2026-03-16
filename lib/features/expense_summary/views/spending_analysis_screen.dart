@@ -110,7 +110,9 @@ class _SpendingAnalysisScreenState extends State<SpendingAnalysisScreen>
                         ExpenseSummaryScreen(
                             userId: widget.userId,
                             totalAllocated: state.totalAllocated),
-                        BudgetsTab()
+                        BudgetsTab(
+                          userId: widget.userId,
+                        )
                       ],
                     );
                   }
@@ -123,6 +125,5 @@ class _SpendingAnalysisScreenState extends State<SpendingAnalysisScreen>
         ),
       ),
     );
-
   }
 }
