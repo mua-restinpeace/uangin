@@ -16,7 +16,6 @@ final class GetBudgetsFailure extends GetBudgetsState {
   const GetBudgetsFailure(this.errorMsg);
 
   @override
-  // TODO: implement props
   List<Object?> get props => [errorMsg];
 }
 final class GetBudgetsSuccess extends GetBudgetsState {

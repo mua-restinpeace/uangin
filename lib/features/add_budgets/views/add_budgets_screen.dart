@@ -364,7 +364,7 @@ class _AddBudgetsScreenState extends State<AddBudgetsScreen> {
 
       context.read<AddBudgetsBloc>().add(AddBudgetSubmitted(
           userId: widget.userId,
-          name: _descriptionController.text!,
+          name: _descriptionController.text,
           icon: 'lib/assets/icons/tag_black.svg',
           color: '#888989',
           allocatedAmount: amount,

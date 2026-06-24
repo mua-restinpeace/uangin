@@ -9,6 +9,7 @@ import 'package:uangin/blocs/get_total_allocated_budgets/get_total_allocated_bud
 import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
+import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/onBoarding/views/on_boarding_screen.dart';
 import 'package:uangin/features/onBoarding/views/splash_screen.dart';
@@ -69,6 +70,10 @@ class _MyAppViewState extends State<MyAppView> {
         BlocProvider(
           create: (context) =>
               GetTotalAllocatedBudgetsBloc(context.read<AllowanceRepository>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              GetActiveSavingGoalsBloc(context.read<AllowanceRepository>()),
         )
       ],
       child: MaterialApp(

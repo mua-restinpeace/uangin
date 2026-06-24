@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_repository/user_repository.dart';
 
 part 'authentication_event.dart';
@@ -24,13 +25,15 @@ class AuthenticationBloc
         add(AuthenticationUserChanged(user));
       }
     });
-    on<AuthenticationUserChanged>((event, emit) {
+    on<AuthenticationUserChanged>((event, emit) async {
+      await _saveUserIdForBackgroundTask(event.user.userId);
       emit(AuthenticationState.authenticated(event.user));
     });
 
     on<AuthenticatonLogoutRequest>((event, emit) async {
       final hasSeenOnBoarding = await userRepository.hasOnBoardingComplete();
       if (hasSeenOnBoarding) {
+        await _clearuserIdForBackgroundTask();
         emit(const AuthenticationState.unauthenticated());
       } else {
         emit(const AuthenticationState.unknown());
@@ -47,5 +50,16 @@ class AuthenticationBloc
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
+  }
+
+  Future<void> _saveUserIdForBackgroundTask(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+  }
+
+  Future<void> _clearuserIdForBackgroundTask() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+    log('userId cleared from background task');
   }
 }

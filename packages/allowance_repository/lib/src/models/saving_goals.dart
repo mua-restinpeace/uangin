@@ -6,7 +6,7 @@ class SavingGoals extends Equatable {
   String userId;
   String name;
   String? description;
-  String icon;
+  String? icon;
   double targetAmount;
   double currentAmount;
   DateTime? createdDate;
@@ -19,7 +19,7 @@ class SavingGoals extends Equatable {
     required this.userId,
     required this.name,
     this.description,
-    required this.icon,
+    this.icon,
     required this.targetAmount,
     this.currentAmount = 0.0,
     required this.createdDate,

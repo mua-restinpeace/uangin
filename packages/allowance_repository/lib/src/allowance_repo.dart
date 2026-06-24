@@ -38,6 +38,10 @@ abstract class AllowanceRepository {
   Future<void> udpateBudgetSpentAmount(
       String userId, String budgetId, double amountToAdd);
 
+  Future<void> renewExpiredBudgets(
+    String userId
+  );
+
   // transaction operation
   Future<Transactions> addTransaction(
       {required String userId,
@@ -71,7 +75,7 @@ abstract class AllowanceRepository {
       {required String userId,
       required String name,
       String? description,
-      required String icon,
+      String? icon,
       required double targetAmount,
       DateTime? targetDate});
 

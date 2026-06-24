@@ -17,13 +17,13 @@ class GetBudgetsBloc extends Bloc<GetBudgetsEvent, GetBudgetsState> {
       emit(GetBudgetsLoading());
       try {
         await _budgetSubscription?.cancel();
+        await _allowanceRepository.renewExpiredBudgets(event.userId);
 
         _budgetSubscription = _allowanceRepository
             .getActiveBudgets(event.userId)
             .listen((budget) {
-            add(BudgetUpdate(budget));
-          }
-        );
+          add(BudgetUpdate(budget));
+        });
       } catch (e) {
         log('error getting budgets: $e');
         emit(GetBudgetsFailure(e.toString()));
@@ -31,9 +31,8 @@ class GetBudgetsBloc extends Bloc<GetBudgetsEvent, GetBudgetsState> {
     });
 
     on<BudgetUpdate>((event, emit) {
-        emit(GetBudgetsSuccess(event.budgetList));
-      }
-    );
+      emit(GetBudgetsSuccess(event.budgetList));
+    });
   }
 
   @override

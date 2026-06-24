@@ -17,7 +17,9 @@ import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
 import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
+import 'package:uangin/features/add_saving_goals/views/add_saving_goals_screen.dart';
 import 'package:uangin/features/expense_summary/views/spending_analysis_screen.dart';
+import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 
@@ -59,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
       context
           .read<GetTotalAllocatedBudgetsBloc>()
           .add(GetTotalAllocatedBudgets(_userId));
+
+      context.read<GetActiveSavingGoalsBloc>().add(GetActiveGoals(_userId));
     }
   }
 
@@ -105,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: CircularProgressIndicator(),
                         );
                       } else if (state is GetUserSuccess) {
-                        log('HomeScreen: Rebuilding with user information - ${state.user}');
+                        // log('HomeScreen: Rebuilding with user information - ${state.user}');
                         return _buildAllowanceCard(
                             context, state.user.currentAllowance, date);
                       }
@@ -129,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 16,
                   ),
-                  _buildTrancsactionSection(context),
+                  _buildTransactionSection(context),
                   const SizedBox(
                     height: 100,
                   )
@@ -302,7 +306,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSpendingSection(BuildContext context) {
-    return IntrinsicHeight(
+    return SizedBox(
+      height: 180,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -322,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
@@ -345,18 +351,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 16,
                   ),
-                  Text(
-                    'Set your goals and track your progrres',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(fontSize: 14),
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  Expanded(child: _buildSavingGoalsList([])),
                   MyButton(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddSavingGoalsScreen(
+                                userId: _userId,
+                              ),
+                            ));
+                      },
                       content: Text(
                         'Add Goals',
                         style: Theme.of(context)
@@ -370,6 +375,108 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildSavingGoalsList(List<SavingGoals> goals) {
+    return BlocBuilder<GetActiveSavingGoalsBloc, GetActiveSavingGoalsState>(
+      builder: (context, state) {
+        if (state is GetActiveSavingGoalsLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (state is GetActiveSavingGoalsSuccess) {
+          final goals = state.goals;
+          log('Saving goals list: ${state.goals}');
+          if (goals.isEmpty) {
+            return Text(
+              'Set your goals and track your progress',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontSize: 14),
+            );
+          } else {
+            return ListView.separated(
+              // shrinkWrap: true,
+              // physics: const NeverScrollableScrollPhysics(),
+              itemCount: goals.length,
+              separatorBuilder: (context, index) => const SizedBox(
+                height: 8,
+              ),
+              itemBuilder: (context, index) {
+                final goal = goals[index];
+                final percentage =
+                    (goal.currentAmount / goal.targetAmount) * 100;
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          goal.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(fontSize: 12),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Text(
+                              'IDR',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(fontSize: 12),
+                            ),
+                            Text(
+                              '${goal.targetAmount}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(fontSize: 12),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        CustomLinearProgressBar(
+                          percentage: percentage,
+                          progressColor: MyColors.orange,
+                          width: MediaQuery.of(context).size.width * 0.25,
+                        ),
+                        const Spacer(),
+                        Text(
+                          '$percentage%',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontSize: 12),
+                        )
+                      ],
+                    )
+                  ],
+                );
+              },
+            );
+          }
+        }
+
+        if (state is GetActiveSavingGoalsFailure) {
+          return const Center(
+            child: Text('Failed to fetch saving goals budget'),
+          );
+        }
+
+        return const SizedBox();
+      },
     );
   }
 
@@ -397,8 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final totalSpent = summaryState.totalSpent;
                 final double percentage =
                     totalAllocated > 0 ? totalSpent / totalAllocated : 0;
-                final spentPercentage =
-                    (100.00 - percentage * 100);
+                final spentPercentage = (100.00 - percentage * 100);
 
                 return GestureDetector(
                   onTap: () {
@@ -418,6 +524,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         border: Border.all(color: MyColors.lightGrey),
                         borderRadius: BorderRadius.circular(20)),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -474,9 +581,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             )
                           ],
                         ),
-                        const SizedBox(
-                          height: 4,
-                        ),
+                        const Spacer(),
                         Text(
                           '(${spentPercentage.toStringAsFixed(0)}% left)',
                           style: Theme.of(context)
@@ -488,7 +593,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? MyColors.red
                                       : MyColors.green),
                         ),
-                        const Spacer(),
+                        const SizedBox(
+                          height: 8,
+                        ),
                         CustomLinearProgressBar(
                           percentage: percentage,
                           progressColor: MyColors.orange,
@@ -515,7 +622,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTrancsactionSection(BuildContext context) {
+  Widget _buildTransactionSection(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           color: MyColors.fillColor,

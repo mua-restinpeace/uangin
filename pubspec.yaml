@@ -44,6 +44,7 @@ dependencies:
   flutter_slidable: 
   currency_text_input_formatter: 
   flutter_launcher_icons:
+  workmanager: 
 
   user_repository:
     path: packages/user_repository
@@ -59,9 +60,9 @@ dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "lib/assets/icons/uangin_logo.png"
+  image_path: "lib/assets/icons/logo_with_background.png"
   adaptive_icon_background: "#C9F56A" 
-  adaptive_icon_foreground: "lib/assets/icons/uangin_logo_transparant.png"  #
+  adaptive_icon_foreground: "lib/assets/icons/logo.png"  #
 
 dev_dependencies:
   flutter_test:
