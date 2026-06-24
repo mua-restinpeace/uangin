@@ -58,7 +58,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
       final snapshot = await _firestore
           .collection('users')
           .doc(userId)
-          .collection('allowance')
+          .collection('allowances')
           .orderBy('date', descending: true)
           .limit(1)
           .get();
@@ -77,10 +77,14 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   Future<Allowances> addAllowance(
       {required String userId,
       required double amount,
-      double savedAmount = 0.0,
+      required double currentAllowance,
+      required bool addToSaving,
       required DateTime date,
       String? notes}) async {
     try {
+      final batch = _firestore.batch();
+
+      // create allowance
       final docRef = _firestore
           .collection('users')
           .doc(userId)
@@ -91,18 +95,28 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           allowanceId: docRef.id,
           userId: userId,
           amount: amount,
-          savedAmount: savedAmount,
+          savedAmount: addToSaving ? currentAllowance : 0.0,
           date: date,
           notes: notes);
+      batch.set(docRef, allowance.toEnity().toJSON());
 
-      await docRef.set(allowance.toEnity().toJSON());
+      // update user allowance
+      final userRef = _firestore.collection('users').doc(userId);
 
-      await _updateUserAllowance(userId, amount + savedAmount);
+      if (addToSaving) {
+        batch.update(userRef, {
+          'currentAllowance': amount,
+          'totalSaving': FieldValue.increment(currentAllowance),
+          'lastAllowanceDate': Timestamp.fromDate(date)
+        });
+      } else {
+        batch.update(userRef, {
+          'currentAllowance': FieldValue.increment(amount),
+          'lastAllowanceDate': Timestamp.fromDate(date)
+        });
+      }
 
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .update({'lastAllowanceDate': date.millisecondsSinceEpoch});
+      await batch.commit();
 
       log('allowance added: ${allowance.allowanceId}');
       return allowance;
@@ -249,6 +263,50 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
     }
   }
 
+  @override
+  Future<void> renewExpiredBudgets(String userId) async {
+    try {
+      final now = DateTime.now();
+
+      final snapshots = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('budgets')
+          .where('periodEnd', isLessThan: Timestamp.fromDate(now))
+          .get();
+
+      if (snapshots.docs.isEmpty) {
+        log('No expired budgets renew');
+        return;
+      }
+
+      final batch = _firestore.batch();
+
+      for (var doc in snapshots.docs) {
+        final budget = Budgets.fromEntity(BudgetEntity.fromJSON(doc.data()));
+
+        final newPeriodStart = DateTime(now.year, now.month, now.day)
+            .subtract(Duration(days: now.weekday - 1));
+        final newPeriodEnd = newPeriodStart.add(const Duration(
+            days: 6, hours: 23, minutes: 59, seconds: 59, milliseconds: 999));
+
+        batch.update(doc.reference, {
+          'periodStart': Timestamp.fromDate(newPeriodStart),
+          'periodEnd': Timestamp.fromDate(newPeriodEnd),
+          'spentAmount': 0.0,
+        });
+
+        log('renewed budget: ${budget.budgetId}');
+      }
+
+      await batch.commit();
+      log('Budgets renewed completed for user: $userId');
+    } catch (e) {
+      log('Error renewing expired budgets');
+      rethrow;
+    }
+  }
+
   // transaction operations
   @override
   Future<Transactions> addTransaction(
@@ -256,6 +314,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
       required String budgetId,
       required String budgetName,
       required String budgetIcon,
+      required String budgetColor,
       required double amount,
       required DateTime date,
       TransactionType type = TransactionType.expense,
@@ -268,15 +327,17 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
           .doc();
 
       final transaction = Transactions(
-          transactionId: docRef.id,
-          userId: userId,
-          budgetId: budgetId,
-          budgetName: budgetName,
-          budgetIcon: budgetIcon,
-          amount: amount,
-          date: date,
-          description: description,
-          type: type);
+        transactionId: docRef.id,
+        userId: userId,
+        budgetId: budgetId,
+        budgetName: budgetName,
+        budgetIcon: budgetIcon,
+        budgetColor: budgetColor,
+        amount: amount,
+        date: date,
+        description: description,
+        type: type,
+      );
 
       final batch = _firestore.batch();
 
@@ -303,6 +364,64 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   }
 
   @override
+  Future<void> updateTransaction(
+      {required Transactions updatedTransaction,
+      required String originalBudgetId,
+      required double originalAmount}) async {
+    try {
+      final batch = _firestore.batch();
+      final amountDiff = updatedTransaction.amount - originalAmount;
+      final budgetChanged = updatedTransaction.budgetId != originalBudgetId;
+
+      final transactionRef = _firestore
+          .collection('users')
+          .doc(updatedTransaction.userId)
+          .collection('transactions')
+          .doc(updatedTransaction.transactionId);
+      batch.update(transactionRef, updatedTransaction.toEntity().toJSON());
+
+      if (budgetChanged) {
+        final originalBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(originalBudgetId);
+        batch.update(originalBudgetRef,
+            {'spentAmount': FieldValue.increment(-originalAmount)});
+
+        final newBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(updatedTransaction.budgetId);
+        batch.update(newBudgetRef,
+            {'spentAmount': FieldValue.increment(updatedTransaction.amount)});
+      } else if (amountDiff != 0) {
+        final updatedBudgetRef = _firestore
+            .collection('users')
+            .doc(updatedTransaction.userId)
+            .collection('budgets')
+            .doc(updatedTransaction.budgetId);
+        batch.update(updatedBudgetRef,
+            {'spentAmount': FieldValue.increment(amountDiff)});
+      }
+
+      if (amountDiff != 0) {
+        final updatedUserRef =
+            _firestore.collection('users').doc(updatedTransaction.userId);
+        batch.update(updatedUserRef,
+            {'currentAllowance': FieldValue.increment(-amountDiff)});
+      }
+
+      await batch.commit();
+      log('Transaction updated: $updatedTransaction');
+    } catch (e) {
+      log('Error update transaction: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Stream<List<Transactions>> getTransactions(String userId) {
     return _firestore
         .collection('users')
@@ -324,8 +443,8 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         .collection('users')
         .doc(userId)
         .collection('transactions')
-        .where('date', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch)
-        .where('date', isLessThanOrEqualTo: endDate.millisecondsSinceEpoch)
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .orderBy('date', descending: true)
         .snapshots()
         .map((snapshot) {
@@ -392,12 +511,13 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
     }
   }
 
+  // saving goals operations
   @override
   Future<SavingGoals> createdSavingGoal(
       {required String userId,
       required String name,
       String? description,
-      required String icon,
+      String? icon,
       required double targetAmount,
       DateTime? targetDate}) async {
     try {
@@ -445,15 +565,15 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         }
 
         final data = snapshot.data()!;
-        final currentAmount = (data['curentAmount'] as num?)?.toDouble() ?? 0.0;
+        final currentAmount = (data['currentAmount'] as num?)?.toDouble() ?? 0.0;
         final targetAmount = (data['targetAmount'] as num).toDouble();
         final newAmount = currentAmount + amountToAdd;
 
         final updates = <String, dynamic>{'currentAmount': newAmount};
 
         if (newAmount >= targetAmount &&
-            !(data['isCompleted'] as bool? ?? false)) {
-          updates['isCompleted'] = true;
+            !(data['isComplete'] as bool? ?? false)) {
+          updates['isComplete'] = true;
           updates['completedDate'] = DateTime.now().millisecondsSinceEpoch;
 
           final userRef = _firestore.collection('users').doc(userId);
@@ -482,7 +602,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         .collection('users')
         .doc(userId)
         .collection('savingGoals')
-        .where('isCompleted', isEqualTo: false)
+        .where('isComplete', isEqualTo: false)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -497,7 +617,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         .collection('users')
         .doc(userId)
         .collection('savingGoals')
-        .where('isCompleted', isEqualTo: true)
+        .where('isComplete', isEqualTo: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -525,25 +645,28 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
 
   // analytics & summary operations
   @override
-  Future<double> getTotalSpentThisPeriod(
-      String userId, DateTime periodStart, DateTime periodEnd) async {
+  Stream<double> getTotalSpentThisPeriod(
+      String userId, DateTime periodStart, DateTime periodEnd) {
     try {
-      final snapshot = await _firestore
+      log('getting total spent...');
+      return _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .where('date',
-              isGreaterThanOrEqualTo: periodStart.millisecondsSinceEpoch)
-          .where('date', isLessThanOrEqualTo: periodEnd.millisecondsSinceEpoch)
+              isGreaterThanOrEqualTo: Timestamp.fromDate(periodStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(periodEnd))
           .where('type', isEqualTo: 'expense')
-          .get();
+          .snapshots()
+          .map((snapshot) {
+        double total = 0.0;
+        for (var doc in snapshot.docs) {
+          total += (doc.data()['amount'] as num).toDouble();
+        }
 
-      double total = 0.0;
-      for (var doc in snapshot.docs) {
-        total += (doc.data()['amount'] as num).toDouble();
-      }
-
-      return total;
+        log('getTotalSpentThisPeriod: total spent amount = $total');
+        return total;
+      });
     } catch (e) {
       log('error get total spent amount: $e');
       rethrow;
@@ -551,40 +674,52 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getSpendingBreakdown(
-      String userId, DateTime periodStart, DateTime periodEnd) async {
+  Stream<double> getTotalAllocatedBudgets(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('budgets')
+        .snapshots()
+        .map((snapshot) {
+      double totalAllocated = 0.0;
+
+      for (var doc in snapshot.docs) {
+        totalAllocated += (doc.data()['allocatedAmount'] as num).toDouble();
+      }
+
+      return totalAllocated;
+    });
+  }
+
+  @override
+  Stream<Map<String, double>> getSpendingBreakdown(
+      String userId, DateTime periodStart, DateTime periodEnd) {
     try {
-      final snapshot = await _firestore
+      return _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .where('date',
-              isGreaterThanOrEqualTo: periodStart.millisecondsSinceEpoch)
-          .where('date', isLessThanOrEqualTo: periodEnd.millisecondsSinceEpoch)
+              isGreaterThanOrEqualTo: Timestamp.fromDate(periodStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(periodEnd))
           .where('type', isEqualTo: 'expense')
-          .get();
+          .snapshots()
+          .map((snapshot) {
+        Map<String, double> breakdown = {};
 
-      Map<String, dynamic> breakdown = {};
+        for (var doc in snapshot.docs) {
+          final data = doc.data();
+          final budgetName = data['budgetName'] as String;
+          final amount = (data['amount'] as num).toDouble();
 
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
-        final budgetName = data['budgetName'] as String;
-        final amount = (data['amount'] as num).toDouble();
+          breakdown[budgetName] = (breakdown[budgetName] ?? 0.0) + amount;
+        }
 
-        breakdown[budgetName] = (breakdown[budgetName] ?? 0.0) + amount;
-      }
-
-      return breakdown;
+        return breakdown;
+      });
     } catch (e) {
       log('error getting spending breakdown');
       rethrow;
     }
-  }
-
-  Future<void> _updateUserAllowance(String userId, double amountToAdd) async {
-    await _firestore
-        .collection('users')
-        .doc(userId)
-        .update({'currentAllowance': FieldValue.increment(amountToAdd)});
   }
 }

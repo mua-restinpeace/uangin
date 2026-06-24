@@ -17,6 +17,9 @@ dependencies:
   equatable: 
   shared_preferences: 
 
+  allowance_repository:
+    path: ../allowance_repository
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

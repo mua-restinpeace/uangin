@@ -7,6 +7,7 @@ class Transactions extends Equatable {
   String budgetId;
   String budgetName;
   String budgetIcon;
+  String budgetColor;
   double amount;
   DateTime? date;
   String? description;
@@ -18,6 +19,7 @@ class Transactions extends Equatable {
       required this.budgetId,
       required this.budgetName,
       required this.budgetIcon,
+      required this.budgetColor,
       required this.amount,
       required this.date,
       this.description,
@@ -29,6 +31,7 @@ class Transactions extends Equatable {
       budgetId: '',
       budgetName: '',
       budgetIcon: '',
+      budgetColor: '',
       amount: 0,
       date: null,
       description: '',
@@ -44,8 +47,9 @@ class Transactions extends Equatable {
         budgetId: budgetId,
         budgetName: budgetName,
         budgetIcon: budgetIcon,
+        budgetColor: budgetColor,
         amount: amount,
-        date: date,
+        date: date!,
         description: description,
         type: type.toString().split('.').last);
   }
@@ -57,6 +61,7 @@ class Transactions extends Equatable {
         budgetId: entity.budgetId,
         budgetName: entity.budgetName,
         budgetIcon: entity.budgetIcon,
+        budgetColor: entity.budgetColor,
         amount: entity.amount,
         date: entity.date,
         description: entity.description,
@@ -68,7 +73,7 @@ class Transactions extends Equatable {
 
   @override
   String toString() {
-    return 'Transactions: $transactionId, $userId, $budgetId, $budgetName, $budgetIcon, $amount, $date, $description, $type';
+    return 'Transactions: $transactionId, $userId, $budgetId, $budgetName, $budgetIcon, $budgetColor, $amount, $date, $description, $type';
   }
 
   @override
@@ -78,6 +83,7 @@ class Transactions extends Equatable {
         budgetId,
         budgetName,
         budgetIcon,
+        budgetColor,
         amount,
         date,
         description,

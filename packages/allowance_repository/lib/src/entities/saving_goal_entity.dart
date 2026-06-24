@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class SavingGoalEntity {
   String goalId;
   String userId;
   String name;
   String? description;
-  String icon;
+  String? icon;
   double targetAmount;
   double currentAmount;
   DateTime? createdDate;
@@ -16,7 +18,7 @@ class SavingGoalEntity {
     required this.userId,
     required this.name,
     this.description,
-    required this.icon,
+    this.icon,
     required this.targetAmount,
     this.currentAmount = 0.0,
     required this.createdDate,
@@ -34,10 +36,12 @@ class SavingGoalEntity {
       'icon': icon,
       'targetAmount': targetAmount,
       'currentAmount': currentAmount,
-      'createdDate': createdDate,
-      'targetDate': targetDate,
+      'createdDate':
+          createdDate != null ? Timestamp.fromDate(createdDate!) : null,
+      'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
       'isComplete': isComplete,
-      'completedDate': completedDate,
+      'completedDate':
+          completedDate != null ? Timestamp.fromDate(completedDate!) : null,
     };
   }
 
@@ -47,12 +51,21 @@ class SavingGoalEntity {
         userId: doc['userId'] as String,
         name: doc['name'] as String,
         description: doc['description'] as String?,
-        icon: doc['icon'] as String,
+        icon: doc['icon'] as String?,
         targetAmount: (doc['targetAmount'] as num).toDouble(),
-        createdDate: DateTime.fromMillisecondsSinceEpoch(doc['createdDate'] as int),
+        createdDate: _dateFromFirebase(doc['createdDate']),
         currentAmount: (doc['currentAmount'] as num?)?.toDouble() ?? 0.0,
-        targetDate: doc['targetDate'] ? DateTime.fromMillisecondsSinceEpoch(doc['targetDate'] as int) : null,
+        targetDate: _dateFromFirebase(doc['targetDate']),
         isComplete: doc['isComplete'] as bool? ?? false,
-        completedDate: doc['completedDate'] ? DateTime.fromMillisecondsSinceEpoch(doc['completedDate'] as int) : null);
+        completedDate: _dateFromFirebase(doc['completedDate']));
+  }
+
+  static DateTime? _dateFromFirebase(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+
+    throw FormatException('Invalid date value: $value');
   }
 }

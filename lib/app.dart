@@ -15,8 +15,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<UserRepository>.value(value: userRepository,),
-        RepositoryProvider<AllowanceRepository>.value(value: allowanceRepository)
+        RepositoryProvider<UserRepository>.value(
+          value: userRepository,
+        ),
+        RepositoryProvider<AllowanceRepository>.value(
+            value: allowanceRepository)
       ],
       child: MultiBlocProvider(
         providers: [
@@ -24,12 +27,14 @@ class MyApp extends StatelessWidget {
             create: (context) =>
                 AuthenticationBloc(userRepository: userRepository),
           ),
-          BlocProvider<GetUserBloc>(
-            create: (context) =>
-                GetUserBloc(userRepository)..add(GetUser()),
-          ),
         ],
-        child: const MyAppView(),
+        child: Builder(builder: (context) {
+          return BlocProvider(
+            create: (context) =>
+                GetUserBloc(context.read<AuthenticationBloc>(), userRepository),
+            child: const MyAppView(),
+          );
+        }),
       ),
     );
   }

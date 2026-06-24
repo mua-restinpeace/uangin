@@ -1,17 +1,21 @@
 import 'dart:ui';
 
 import 'package:allowance_repository/allowance_repository.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:money_formatter/money_formatter.dart';
 import 'package:uangin/core/theme/colors.dart';
+import 'package:uangin/core/widgets/animated_circle.dart';
 import 'package:uangin/core/widgets/long_button.dart';
-import 'package:uangin/features/add_expense/bloc/get_budgets/get_budgets_bloc.dart';
+import 'package:uangin/features/add_expense/bloc/add_expense/add_expense_bloc.dart';
+import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final String userId;
+  const AddExpenseScreen({required this.userId, super.key});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -19,11 +23,6 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _innerAnimation;
-  late Animation<double> _middleAnimation;
-  late Animation<double> _outterAnimation;
-
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
@@ -33,32 +32,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1200));
-
-    _innerAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeInOut),
-    );
-
-    _middleAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.2, 0.8, curve: Curves.easeInOut),
-    );
-
-    _outterAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.4, 1, curve: Curves.easeInOut),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -74,11 +47,37 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         MoneyFormatter remainingAllowance =
             MoneyFormatter(amount: userState.user.currentAllowance);
 
-        return BlocProvider(
-          create: (context) =>
-              GetBudgetsBloc(context.read<AllowanceRepository>())
-                ..add(GetBudgets(userState.user.userId)),
-          child: _buildContent(remainingAllowance.output.nonSymbol),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) =>
+                  AddExpenseBloc(context.read<AllowanceRepository>()),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  GetBudgetsBloc(context.read<AllowanceRepository>())
+                    ..add(GetBudgets(userState.user.userId)),
+            ),
+          ],
+          child: BlocListener<AddExpenseBloc, AddExpenseState>(
+            listener: (context, state) {
+              if (state is AddExpenseSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Expense added successfully!'),
+                  backgroundColor: MyColors.green,
+                ));
+                Navigator.pop(context);
+              } else if (state is AddExpenseFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to add expense: ${state.message!}'),
+                    backgroundColor: MyColors.red,
+                  ),
+                );
+              }
+            },
+            child: _buildContent(remainingAllowance.output.nonSymbol),
+          ),
         );
       },
     );
@@ -108,24 +107,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
       ),
       body: Stack(
         children: [
-          Positioned(
+          const Positioned(
             bottom: 160,
             // left: -60,
-            child: IgnorePointer(child: _buildAnimatedCircle(context)),
+            child: IgnorePointer(child: AnimatedCircle()),
           ),
-          Positioned(
+          const Positioned(
             top: 160,
             right: 60,
-            child: IgnorePointer(child: _buildAnimatedCircle(context)),
+            child: IgnorePointer(child: AnimatedCircle()),
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom -
-                  MediaQuery.of(context).viewInsets.bottom,
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom -
+                    MediaQuery.of(context).viewInsets.bottom,
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Form(
@@ -140,9 +140,20 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                         const SizedBox(
                           height: 24,
                         ),
-                        LongButton(
-                          text: 'Add',
-                          onPressed: () {},
+                        BlocBuilder<AddExpenseBloc, AddExpenseState>(
+                          builder: (context, state) {
+                            if (state is AddExpenseLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(color: MyColors.black, strokeCap: StrokeCap.round,),
+                              );
+                            }
+                            return Builder(builder: (context) {
+                              return LongButton(
+                                text: 'Add',
+                                onPressed: () => _handleExpenseAdd(context),
+                              );
+                            });
+                          },
                         ),
                         const SizedBox(
                           height: 24,
@@ -157,95 +168,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         ],
       ),
     );
-  }
-
-  Widget _buildAnimatedCircle(BuildContext context) {
-    return AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 1.6,
-            width: MediaQuery.of(context).size.width * 1.6,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // outter circle
-                Transform.scale(
-                  scale: 0.8 + (_outterAnimation.value * 0.2),
-                  child: Opacity(
-                    opacity: _outterAnimation.value,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 1.6,
-                      width: MediaQuery.of(context).size.width * 1.6,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.4),
-                            blurRadius: 80,
-                            spreadRadius: 10,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                // middle circle
-                Transform.scale(
-                  scale: 0.8 + (_middleAnimation.value * 0.2),
-                  child: Opacity(
-                    opacity: _middleAnimation.value,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 1.3,
-                      width: MediaQuery.of(context).size.width * 1.3,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.1),
-                            blurRadius: 50,
-                            spreadRadius: 5,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                // inner circle
-                Transform.scale(
-                  scale: 0.5 + (_innerAnimation.value * 0.5),
-                  child: Opacity(
-                    opacity: _innerAnimation.value,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
   }
 
   Widget _buildAllowanceRemaining(String allowanceRemaining) {
@@ -265,8 +187,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                 padding: const EdgeInsets.all(8.0),
                 child: SvgPicture.asset(
                   'lib/assets/icons/card.svg',
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                 ),
               ),
             ),
@@ -343,21 +265,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                           color: Color(
                             int.parse(
                                 '0xFF${_selectedBudgets!.color.replaceAll('#', '')}'),
-                          ),
+                          ).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: Color(
                                 int.parse(
                                     '0xFF${_selectedBudgets!.color.replaceAll('#', '')}'),
-                              ),
+                              ).withOpacity(0.2),
                             )
                           ],
                         ),
                         child: SvgPicture.asset(
                           _selectedBudgets!.icon,
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                         ),
                       ),
                       const SizedBox(
@@ -425,6 +347,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                         Flexible(
                           child: IntrinsicWidth(
                             child: TextFormField(
+                              inputFormatters: [
+                                CurrencyTextInputFormatter.currency(
+                                  symbol: '',
+                                  decimalDigits: 0,
+                                )
+                              ],
                               controller: _amountController,
                               cursorColor: MyColors.black,
                               textAlign: TextAlign.center,
@@ -434,7 +362,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                                   ?.copyWith(fontSize: 40),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amunt!';
+                                  return 'Please enter a valid amount!';
                                 }
                                 return null;
                               },
@@ -493,7 +421,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? MyColors.primary : color,
+                color: isSelected ? MyColors.primary : color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SvgPicture.asset(
@@ -529,7 +457,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
   Widget _buildCategoriesSelection() {
     return BlocBuilder<GetBudgetsBloc, GetBudgetsState>(
       builder: (context, state) {
-        if(state is GetBudgetsLoading){
+        if (state is GetBudgetsLoading) {
           return const SizedBox(
             height: 56,
             child: Center(
@@ -569,8 +497,45 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
           );
         }
 
-        return const SizedBox(height: 56,);
+        return const SizedBox(
+          height: 56,
+        );
       },
     );
+  }
+
+  void _handleExpenseAdd(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedBudgets == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Please select budgets for this expense')));
+        return;
+      }
+
+      final rawAmount = _amountController.text
+          .replaceAll('.', '')
+          .replaceAll(',', '')
+          .replaceAll(' ', '')
+          .trim();
+
+      final amount = double.tryParse(rawAmount);
+      if (amount == null || amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a valid amount')));
+        return;
+      }
+
+      context.read<AddExpenseBloc>().add(AddExpenseSubmitted(
+          userId: widget.userId,
+          budgetId: _selectedBudgets!.budgetId,
+          budgetName: _selectedBudgets!.name,
+          budgetIcon: _selectedBudgets!.icon,
+          budgetColor: _selectedBudgets!.color,
+          amount: amount,
+          date: DateTime.now(),
+          description: _descriptionController.text.isEmpty
+              ? null
+              : _descriptionController.text));
+    }
   }
 }

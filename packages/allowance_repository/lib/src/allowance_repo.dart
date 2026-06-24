@@ -9,7 +9,9 @@ abstract class AllowanceRepository {
   Future<Allowances> addAllowance(
       {required String userId,
       required double amount,
-      double savedAmount,
+      required double currentAllowance,
+      // double savedAmount,
+      required bool addToSaving,
       required DateTime date,
       String? notes});
   Stream<List<Allowances>> getAllowances(String userId);
@@ -24,12 +26,21 @@ abstract class AllowanceRepository {
       required double allocatedAmount,
       required DateTime periodStart,
       required DateTime periodEnd});
+
   Future<void> updateBudget(Budgets budget);
+
   Future<void> deleteBudget(String userId, String budgetId);
+
   Stream<List<Budgets>> getActiveBudgets(String userId);
+
   Future<Budgets?> getBudget(String userId, String budgetId);
+
   Future<void> udpateBudgetSpentAmount(
       String userId, String budgetId, double amountToAdd);
+
+  Future<void> renewExpiredBudgets(
+    String userId
+  );
 
   // transaction operation
   Future<Transactions> addTransaction(
@@ -37,15 +48,26 @@ abstract class AllowanceRepository {
       required String budgetId,
       required String budgetName,
       required String budgetIcon,
+      required String budgetColor,
       required double amount,
       required DateTime date,
       TransactionType type = TransactionType.expense,
       String? description});
+
+  Future<void> updateTransaction({
+    required Transactions updatedTransaction,
+    required String originalBudgetId,
+    required double originalAmount
+  });
+
   Stream<List<Transactions>> getTransactions(String userId);
+
   Stream<List<Transactions>> getTransactionByDateRange(
       String userId, DateTime startDate, DateTime endDate);
+
   Stream<List<Transactions>> getTransactionByBudget(
       String userId, String budgetId);
+
   Future<void> deleteTransaction(String userId, String transactionId);
 
   // saving goal operations
@@ -53,21 +75,30 @@ abstract class AllowanceRepository {
       {required String userId,
       required String name,
       String? description,
-      required String icon,
+      String? icon,
       required double targetAmount,
       DateTime? targetDate});
+
   Future<void> updateSavingGoalProgress(
       String userId, String goalId, double amountToAdd);
+
   Stream<List<SavingGoals>> getActiveSavingGoals(String userId);
+
   Stream<List<SavingGoals>> getCompletedSavingGoals(String userId);
+
   Future<void> deleteSavingGoal(String userId, String goalId);
 
   // analytics & summary operations
-  Future<double> getTotalSpentThisPeriod(
+  Stream<double> getTotalSpentThisPeriod(
     String userId,
     DateTime periodStart,
     DateTime periodEnd,
   );
-  Future<Map<String, dynamic>> getSpendingBreakdown(
+
+  Stream<double> getTotalAllocatedBudgets(
+    String userId
+  );
+  
+  Stream<Map<String, double>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd);
 }

@@ -16,6 +16,7 @@ dependencies:
   rxdart: 
   equatable: 
   shared_preferences: 
+  fake_cloud_firestore:
 
 dev_dependencies:
   flutter_test:
