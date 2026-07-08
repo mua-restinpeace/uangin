@@ -124,10 +124,9 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
                         BlocBuilder<AddAllowanceBloc, AddAllowanceState>(
                           builder: (context, state) {
                             return Builder(builder: (context) {
-                              if(state is AddAllowanceLoading){
+                              if (state is AddAllowanceLoading) {
                                 return const Center(
-                                  child: CircularProgressIndicator()
-                                );
+                                    child: CircularProgressIndicator());
                               }
                               return LongButton(
                                 text: 'Add Allowance',
@@ -269,29 +268,6 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: _notesController,
-                      textAlign: TextAlign.center,
-                      cursorColor: MyColors.black,
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayMedium
-                          ?.copyWith(fontSize: 18),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        hintText: 'Add notes',
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(fontSize: 18, color: MyColors.lightGrey),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 12,
-                    ),
                     // amount field
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -348,6 +324,28 @@ class _AddAllowanceScreenState extends State<AddAllowanceScreen> {
                           ),
                         )
                       ],
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    TextFormField(
+                      controller: _notesController,
+                      textAlign: TextAlign.center,
+                      cursorColor: MyColors.black,
+                      style: Theme.of(context)
+                          .textTheme
+                          .displayMedium
+                          ?.copyWith(fontSize: 18),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        hintText: 'Add notes',
+                        hintStyle: Theme.of(context)
+                            .textTheme
+                            .displayMedium
+                            ?.copyWith(fontSize: 18, color: MyColors.lightGrey),
+                      ),
                     ),
                   ],
                 ),

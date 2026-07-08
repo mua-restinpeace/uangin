@@ -22,6 +22,7 @@ import 'package:uangin/features/expense_summary/views/spending_analysis_screen.d
 import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
+import 'package:uangin/features/wallet/views/wallet_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -111,9 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       } else if (state is GetUserSuccess) {
                         // log('HomeScreen: Rebuilding with user information - ${state.user}');
                         return _buildAllowanceCard(
-                            context, state.user.currentAllowance, date);
+                            context,
+                            state.user.currentAllowance,
+                            state.user.totalSaving,
+                            date);
                       }
-                      return _buildAllowanceCard(context, 0.0, date);
+                      return _buildAllowanceCard(context, 0.0, 0.0, date);
                     },
                   ),
                   const SizedBox(
@@ -172,142 +176,152 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAllowanceCard(
-      BuildContext context, double currentAllowance, String date) {
+  Widget _buildAllowanceCard(BuildContext context, double currentAllowance,
+      double totalSaving, String date) {
     MoneyFormatter allowanceRemaining =
         MoneyFormatter(amount: currentAllowance);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Current Allowance',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 16),
-              ),
-              Text(
-                date,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 16),
-              )
-            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const WalletScreen(),
           ),
-          const SizedBox(
-            height: 8,
-          ),
-          Row(
-            children: [
-              Text(
-                'IDR',
-                style: Theme.of(context)
-                    .textTheme
-                    .displayLarge
-                    ?.copyWith(color: MyColors.grey, fontSize: 32),
-              ),
-              const SizedBox(
-                width: 4,
-              ),
-              _showCurrentAllowance
-                  ? Text(
-                      allowanceRemaining.output.nonSymbol.toString(),
-                      style: currentAllowance > 0
-                          ? Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(fontSize: 32)
-                          : Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(fontSize: 32, color: MyColors.red),
-                    )
-                  : Text(
-                      allowanceRemaining.output.nonSymbol
-                          .toString()
-                          .replaceAll('-', '')
-                          .replaceAll(RegExp(r"[^,.]"), "•"),
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayLarge
-                          ?.copyWith(fontSize: 32),
-                    )
-            ],
-          ),
-          const SizedBox(
-            height: 24,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MyButton(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddAllowanceScreen(
-                        currentAllowance: currentAllowance,
-                        userId: _userId,
-                      ),
-                    ),
-                  );
-                },
-                content: Row(
-                  children: [
-                    SvgPicture.asset(
-                      'lib/assets/icons/plus.svg',
-                      width: 24,
-                      height: 24,
-                    ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Text(
-                      'Add allowance',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayMedium
-                          ?.copyWith(fontSize: 16, color: MyColors.white),
-                    )
-                  ],
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(20)),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Current Allowance',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 16),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              ),
-              MyButton(
-                onTap: toggleShowCurrentAllowance,
-                content: _showCurrentAllowance
-                    ? SvgPicture.asset(
-                        'lib/assets/icons/eye_open_white.svg',
-                        width: 24,
-                        height: 24,
+                Text(
+                  date,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 16),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Row(
+              children: [
+                Text(
+                  'IDR',
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge
+                      ?.copyWith(color: MyColors.grey, fontSize: 32),
+                ),
+                const SizedBox(
+                  width: 4,
+                ),
+                _showCurrentAllowance
+                    ? Text(
+                        allowanceRemaining.output.nonSymbol.toString(),
+                        style: currentAllowance > 0
+                            ? Theme.of(context)
+                                .textTheme
+                                .displayLarge
+                                ?.copyWith(fontSize: 32)
+                            : Theme.of(context)
+                                .textTheme
+                                .displayLarge
+                                ?.copyWith(fontSize: 32, color: MyColors.red),
                       )
-                    : SvgPicture.asset(
-                        'lib/assets/icons/eye_close_white.svg',
+                    : Text(
+                        allowanceRemaining.output.nonSymbol
+                            .toString()
+                            .replaceAll('-', '')
+                            .replaceAll(RegExp(r"[^,.]"), "•"),
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge
+                            ?.copyWith(fontSize: 32),
+                      )
+              ],
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MyButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddAllowanceScreen(
+                          currentAllowance: currentAllowance,
+                          userId: _userId,
+                        ),
+                      ),
+                    );
+                  },
+                  content: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'lib/assets/icons/plus.svg',
                         width: 24,
                         height: 24,
                       ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              )
-            ],
-          )
-        ],
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      Text(
+                        'Add allowance',
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium
+                            ?.copyWith(fontSize: 16, color: MyColors.white),
+                      )
+                    ],
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                ),
+                MyButton(
+                  onTap: toggleShowCurrentAllowance,
+                  content: _showCurrentAllowance
+                      ? SvgPicture.asset(
+                          'lib/assets/icons/eye_open_white.svg',
+                          width: 24,
+                          height: 24,
+                        )
+                      : SvgPicture.asset(
+                          'lib/assets/icons/eye_close_white.svg',
+                          width: 24,
+                          height: 24,
+                        ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSpendingSection(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 200,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -352,6 +366,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 16,
                   ),
                   Expanded(child: _buildSavingGoalsList([])),
+                  const SizedBox(
+                    height: 16,
+                  ),
                   MyButton(
                       onTap: () {
                         Navigator.push(
@@ -376,6 +393,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  static const List<Color> _progressColor = [
+    MyColors.orange,
+    MyColors.purple,
+    MyColors.deepBlue,
+    MyColors.yellow,
+    MyColors.green,
+    MyColors.red
+  ];
+
+  Color _goalColor(int index) {
+    return _progressColor[index % _progressColor.length];
   }
 
   Widget _buildSavingGoalsList(List<SavingGoals> goals) {
@@ -408,8 +438,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               itemBuilder: (context, index) {
                 final goal = goals[index];
+                final progressColor = _goalColor(index);
                 final percentage =
-                    (goal.currentAmount / goal.targetAmount) * 100;
+                    (goal.currentAmount / goal.targetAmount).clamp(0.0, 1.0);
                 return Column(
                   children: [
                     Row(
@@ -447,14 +478,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Row(
                       children: [
-                        CustomLinearProgressBar(
-                          percentage: percentage,
-                          progressColor: MyColors.orange,
-                          width: MediaQuery.of(context).size.width * 0.25,
+                        Expanded(
+                          child: CustomLinearProgressBar(
+                            percentage: percentage,
+                            progressColor: progressColor,
+                          ),
                         ),
-                        const Spacer(),
+                        const SizedBox(
+                          width: 6,
+                        ),
                         Text(
-                          '$percentage%',
+                          '${(percentage * 100).round().toStringAsFixed(0)}%',
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
@@ -511,9 +545,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SpendingAnalysisScreen(
-                            userId: _userId,
-                          ),
+                          builder: (context) => SpendingAnalysisScreen(),
                         ));
                   },
                   child: Container(

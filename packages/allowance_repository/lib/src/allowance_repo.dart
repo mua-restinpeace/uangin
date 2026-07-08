@@ -3,7 +3,6 @@ import 'package:allowance_repository/allowance_repository.dart';
 abstract class AllowanceRepository {
   // user allowance balance
   Future<double> getCurrentAllowance(String userId);
-  Future<void> udpateCurrentAllowance(String userId, double newAmount);
 
   // allowance operations
   Future<Allowances> addAllowance(
@@ -14,8 +13,15 @@ abstract class AllowanceRepository {
       required bool addToSaving,
       required DateTime date,
       String? notes});
+  Future<Allowances> updateCurrentAllowance({
+    required String userId,
+    required double targetAmount,
+    required DateTime date,
+    String? notes,
+  });
   Stream<List<Allowances>> getAllowances(String userId);
   Future<Allowances?> getLatestAllowance(String userId);
+  Stream<List<Allowances>> getAllowanceByDateRange(String userId, DateTime startDate, DateTime endDate);
 
   // budget operations
   Future<Budgets> createBudget(
@@ -38,9 +44,7 @@ abstract class AllowanceRepository {
   Future<void> udpateBudgetSpentAmount(
       String userId, String budgetId, double amountToAdd);
 
-  Future<void> renewExpiredBudgets(
-    String userId
-  );
+  Future<void> renewExpiredBudgets(String userId);
 
   // transaction operation
   Future<Transactions> addTransaction(
@@ -54,11 +58,10 @@ abstract class AllowanceRepository {
       TransactionType type = TransactionType.expense,
       String? description});
 
-  Future<void> updateTransaction({
-    required Transactions updatedTransaction,
-    required String originalBudgetId,
-    required double originalAmount
-  });
+  Future<void> updateTransaction(
+      {required Transactions updatedTransaction,
+      required String originalBudgetId,
+      required double originalAmount});
 
   Stream<List<Transactions>> getTransactions(String userId);
 
@@ -79,7 +82,7 @@ abstract class AllowanceRepository {
       required double targetAmount,
       DateTime? targetDate});
 
-  Future<void> updateSavingGoalProgress(
+  Future<double> updateSavingGoalProgress(
       String userId, String goalId, double amountToAdd);
 
   Stream<List<SavingGoals>> getActiveSavingGoals(String userId);
@@ -95,10 +98,8 @@ abstract class AllowanceRepository {
     DateTime periodEnd,
   );
 
-  Stream<double> getTotalAllocatedBudgets(
-    String userId
-  );
-  
+  Stream<double> getTotalAllocatedBudgets(String userId);
+
   Stream<Map<String, double>> getSpendingBreakdown(
       String userId, DateTime periodStart, DateTime periodEnd);
 }

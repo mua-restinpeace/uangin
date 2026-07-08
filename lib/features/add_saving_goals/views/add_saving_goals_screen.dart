@@ -9,7 +9,6 @@ import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/animated_circle.dart';
 import 'package:uangin/core/widgets/long_button.dart';
 import 'package:uangin/features/add_saving_goals/bloc/add_saving_goal_bloc/add_saving_goal_bloc_bloc.dart';
-import 'package:uangin/features/home/views/home_screen.dart';
 
 class AddSavingGoalsScreen extends StatefulWidget {
   final String userId;

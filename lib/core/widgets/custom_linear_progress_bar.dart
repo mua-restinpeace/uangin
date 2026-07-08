@@ -6,11 +6,11 @@ class CustomLinearProgressBar extends StatefulWidget {
   final double percentage;
   final Color? backgroundColor;
   final Color progressColor;
-  final double width;
+  // final double width;
 
   const CustomLinearProgressBar(
       {required this.percentage,
-      this.width = 200,
+      // this.width = 200,
       this.backgroundColor = MyColors.fillColor,
       required this.progressColor,
       super.key});
@@ -23,15 +23,12 @@ class CustomLinearProgressBar extends StatefulWidget {
 class _CustomLinearProgressBarState extends State<CustomLinearProgressBar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _curvedAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    _curvedAnimation =
-        CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
 
     _controller.forward();
   }
@@ -46,14 +43,16 @@ class _CustomLinearProgressBarState extends State<CustomLinearProgressBar>
   Widget build(BuildContext context) {
     final safePercentage =
         widget.percentage.isFinite ? widget.percentage.clamp(0.0, 1.0) : 0.0;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        debugPrint('ProggressBar Constraints: $constraints');
+        final maxWidth = constraints.maxWidth;
 
         return SizedBox(
           height: 20,
-          width: widget.width,
+          width: double.infinity,
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               Container(
                 decoration: BoxDecoration(
@@ -62,11 +61,14 @@ class _CustomLinearProgressBarState extends State<CustomLinearProgressBar>
                   border: Border.all(color: MyColors.lightGrey),
                 ),
               ),
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  final progressWidth =
-                      widget.width * safePercentage * _curvedAnimation.value;
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(
+                  begin: 0.0,
+                  end: safePercentage,
+                ),
+                duration: const Duration(milliseconds: 900),
+                builder: (context, animatedPercentage, child) {
+                  final progressWidth = maxWidth * animatedPercentage;
 
                   return SizedBox(
                     width: progressWidth,
@@ -93,7 +95,7 @@ class _CustomLinearProgressBarState extends State<CustomLinearProgressBar>
                     ),
                   );
                 },
-              ),
+              )
             ],
           ),
         );

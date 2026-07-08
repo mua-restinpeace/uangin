@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/widgets/bottom_navigation/custom_bottom_navigator.dart';
 import 'package:uangin/features/add_expense/views/add_expense_screen.dart';
+import 'package:uangin/features/expense_summary/views/spending_analysis_screen.dart';
 import 'package:uangin/features/home/views/home_screen.dart';
 import 'package:uangin/features/profile/views/profile_screen.dart';
+import 'package:uangin/features/wallet/views/wallet_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -23,7 +25,12 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: [
           IndexedStack(
             index: _selectedIndex,
-            children: const [HomeScreen(), ProfileScreen()],
+            children: const [
+              HomeScreen(),
+              WalletScreen(),
+              SpendingAnalysisScreen(),
+              ProfileScreen(),
+            ],
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -46,10 +53,8 @@ class _MainScaffoldState extends State<MainScaffold> {
                             ),
                           ));
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text('Please wait, loading user data...')));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Please wait, loading user data...')));
                     }
                   },
                 );
