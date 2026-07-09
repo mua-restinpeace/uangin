@@ -43,13 +43,23 @@ class CustomBottomNavigator extends StatelessWidget {
                     isSelected: selectedIndex == 0,
                     onTap: () => onIndexChanged(0),
                   ),
+                  NavigationItem(
+                    icon: 'lib/assets/icons/wallet.svg',
+                    isSelected: selectedIndex == 1,
+                    onTap: () => onIndexChanged(1),
+                  ),
                   const SizedBox(
                     width: 56,
                   ),
                   NavigationItem(
+                    icon: 'lib/assets/icons/money-talks.svg',
+                    isSelected: selectedIndex == 2,
+                    onTap: () => onIndexChanged(2),
+                  ),
+                  NavigationItem(
                     icon: 'lib/assets/icons/nav_profile.svg',
-                    isSelected: selectedIndex == 1,
-                    onTap: () => onIndexChanged(1),
+                    isSelected: selectedIndex == 3,
+                    onTap: () => onIndexChanged(3),
                   ),
                 ],
               ),
@@ -62,16 +72,17 @@ class CustomBottomNavigator extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primary,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4)
-                    )
-                  ]
-                ),
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.primary,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4))
+                    ]),
                 child: SvgPicture.asset(
                   'lib/assets/icons/nav_plus.svg',
                   width: 40,

@@ -49,8 +49,9 @@ class BudgetsTab extends StatelessWidget {
                           height: 48,
                         ),
                         BudgetChart(
-                            totalAllocated: totalAllocated,
-                            spentAmount: summaryState.totalSpent),
+                          totalAllocated: totalAllocated,
+                          spentAmount: summaryState.totalSpent,
+                        ),
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -90,7 +91,9 @@ class BudgetsTab extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddBudgetsScreen(userId: userId,),
+              builder: (context) => AddBudgetsScreen(
+                userId: userId,
+              ),
             ));
       },
       child: Container(
@@ -209,7 +212,7 @@ class BudgetsTab extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .displayMedium
-                ?.copyWith(fontSize: 14, color: MyColors.lightGrey),
+                ?.copyWith(fontSize: 14, color: MyColors.grey),
           ),
           const Spacer(),
           CustomLinearProgressBar(
