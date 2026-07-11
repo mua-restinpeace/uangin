@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/features/about_us/views/about_us_screen.dart';
 import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
+import 'package:uangin/features/help_center/views/help_center_screeen.dart';
 import 'package:uangin/features/profile/widgets/setting_item.dart';
 
 class Settings extends StatelessWidget {
@@ -132,7 +133,13 @@ class Settings extends StatelessWidget {
                 SettingItem(
                   name: 'Help Center',
                   icon: 'lib/assets/icons/question-mark-circle.svg',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HelpCenterScreeen(),
+                        ));
+                  },
                 ),
                 const SizedBox(
                   height: 4,
