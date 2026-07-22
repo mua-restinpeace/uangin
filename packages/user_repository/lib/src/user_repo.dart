@@ -14,4 +14,6 @@ abstract class UserRepository{
   Future<void> setOnBoardingComplete();
 
   Future<bool> hasOnBoardingComplete();
+
+  Future<void> updateAccountInformation({required String userId, required String name, String? photoUrl});
 }

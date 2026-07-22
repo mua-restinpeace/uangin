@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/features/about_us/views/about_us_screen.dart';
+import 'package:uangin/features/account_information/views/account_information_screen.dart';
 import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:uangin/features/help_center/views/help_center_screeen.dart';
 import 'package:uangin/features/profile/widgets/setting_item.dart';
@@ -39,7 +40,14 @@ class Settings extends StatelessWidget {
                 SettingItem(
                   name: 'Account Information',
                   icon: 'lib/assets/icons/person-circle.svg',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AccountInformationScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(
                   height: 4,

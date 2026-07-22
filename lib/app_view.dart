@@ -8,6 +8,7 @@ import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
 import 'package:uangin/blocs/get_total_allocated_budgets/get_total_allocated_budgets_bloc.dart';
 import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
+import 'package:uangin/features/account_information/blocs/update_account_info/update_account_info_bloc.dart';
 import 'package:uangin/features/allowance_history/blocs/allowance_history/allowance_history_bloc.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
 import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:uangin/features/onBoarding/views/splash_screen.dart';
 import 'package:uangin/core/theme/themes.dart';
 import 'package:uangin/features/transaction_records/blocs/get_filtered_transaction/get_filtered_transaction_bloc.dart';
 import 'package:uangin/main_scaffold.dart';
+import 'package:user_repository/user_repository.dart';
 
 class MyAppView extends StatefulWidget {
   const MyAppView({super.key});
@@ -79,6 +81,10 @@ class _MyAppViewState extends State<MyAppView> {
         BlocProvider(
             create: (context) =>
                 AllowanceHistoryBloc(context.read<AllowanceRepository>())),
+        BlocProvider(
+          create: (context) =>
+              UpdateAccountInfoBloc(context.read<UserRepository>()),
+        )
       ],
       child: MaterialApp(
           title: 'Uangin',

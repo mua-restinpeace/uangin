@@ -28,7 +28,10 @@ class FirebaseUserRepo implements UserRepository {
         return Stream.value(null);
       }
 
-      return userCollection.doc(firebaseUser.uid).snapshots().map<MyUser?>((snapshot) {
+      return userCollection
+          .doc(firebaseUser.uid)
+          .snapshots()
+          .map<MyUser?>((snapshot) {
         if (!snapshot.exists || snapshot.data() == null) {
           log('User document does not exist for: ${firebaseUser.uid}');
           return null;
@@ -190,5 +193,27 @@ class FirebaseUserRepo implements UserRepository {
   Future<void> setOnBoardingComplete() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+  }
+
+  @override
+  Future<void> updateAccountInformation({
+    required String userId,
+    required String name,
+    String? photoUrl,
+  }) async {
+    try {
+      final updates = <String, dynamic>{'name': name.trim()};
+
+      // update photo url if a new one was provided to avoid overwriting the existing one
+      if (photoUrl != null) {
+        updates['photoUrl'] = photoUrl;
+      }
+
+      await userCollection.doc(userId).update(updates);
+      log('account info updated for: $userId');
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
   }
 }

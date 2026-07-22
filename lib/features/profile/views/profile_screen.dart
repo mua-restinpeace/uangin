@@ -44,10 +44,8 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header section
-                      ProfiileHeader(
-                        name: userState.user.name,
-                        email: userState.user.email,
-                        goalsAchieved: userState.user.goalsAchieved,
+                      ProfileHeader(
+                        user: userState.user,
                       ),
                       const SizedBox(
                         height: 16,

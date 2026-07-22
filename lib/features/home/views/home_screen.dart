@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showCurrentAllowance
                     ? Text(
                         allowanceRemaining.output.nonSymbol.toString(),
-                        style: currentAllowance > 0
+                        style: currentAllowance >= 0
                             ? Theme.of(context)
                                 .textTheme
                                 .displayLarge

@@ -1,17 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:uangin/core/theme/colors.dart';
+import 'package:user_repository/user_repository.dart';
 
-class ProfiileHeader extends StatelessWidget {
-  final String name;
-  final String email;
-  final int goalsAchieved;
-  final ImageProvider? profileImage;
-  const ProfiileHeader({
-    required this.name,
-    required this.email,
-    required this.goalsAchieved,
-    this.profileImage,
+class ProfileHeader extends StatelessWidget {
+  final MyUser user;
+  const ProfileHeader({
+    required this.user,
     super.key,
   });
 
@@ -72,21 +69,7 @@ class ProfiileHeader extends StatelessWidget {
                     width: 8,
                   ),
                 ),
-                child: ClipOval(
-                  child: profileImage != null
-                      ? Image(
-                          image: profileImage!,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: MyColors.lightGrey.withOpacity(0.4),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child:
-                                SvgPicture.asset('lib/assets/icons/person.svg'),
-                          ),
-                        ),
-                ),
+                child: _buildAvatar(user, context)
               ),
             ),
           ),
@@ -101,7 +84,7 @@ class ProfiileHeader extends StatelessWidget {
                 SizedBox(
                   width: 170,
                   child: Text(
-                    name,
+                    user.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
@@ -115,7 +98,7 @@ class ProfiileHeader extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  email,
+                  user.email,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 16,
                         color: MyColors.grey,
@@ -142,7 +125,7 @@ class ProfiileHeader extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  goalsAchieved.toString(),
+                  user.goalsAchieved.toString(),
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         fontSize: 28,
                         color: MyColors.onPrimary,
@@ -152,6 +135,31 @@ class ProfiileHeader extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(MyUser user, BuildContext context) {
+    if (user.hasPhotoUrl) {
+      return CircleAvatar(
+        radius: 56,
+        backgroundImage: MemoryImage(base64Decode(user.photoUrl)),
+      );
+    }
+
+    final initials = user.name.isNotEmpty
+        ? user.name.trim().split(' ').map((e) => e[0]).take(2).join()
+        : '?';
+
+    return CircleAvatar(
+      radius: 56,
+      backgroundColor: MyColors.primary,
+      child: Text(
+        initials.toUpperCase(),
+        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+              fontSize: 32,
+              color: MyColors.onPrimary,
+            ),
       ),
     );
   }
