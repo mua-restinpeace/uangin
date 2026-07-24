@@ -55,6 +55,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  package_info_plus: 8.3.1
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
 
 flutter_launcher_icons:
   android: true
@@ -96,6 +99,7 @@ flutter:
     - lib/assets/icons/facebook.svg
     - lib/assets/icons/google.svg
     - lib/assets/icons/lock.svg
+    - lib/assets/icons/lock-invert.svg
     - lib/assets/icons/mail.svg
     - lib/assets/icons/eye_open.svg
     - lib/assets/icons/eye_disable.svg
@@ -135,6 +139,15 @@ flutter:
     - lib/assets/icons/coin-swap.svg
     - lib/assets/icons/wallet.svg
     - lib/assets/icons/money-talks.svg
+    - lib/assets/icons/question-mark-circle.svg
+    - lib/assets/icons/person-circle.svg
+    - lib/assets/icons/logout-red.svg
+    - lib/assets/icons/color-pallete.svg
+    - lib/assets/icons/bell-transparent.svg
+    - lib/assets/icons/archive.svg
+    - lib/assets/icons/cevron-right-circle.svg
+    - lib/assets/icons/logo.svg
+    - lib/assets/icons/info-circle.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

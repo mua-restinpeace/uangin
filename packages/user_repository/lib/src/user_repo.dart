@@ -14,4 +14,11 @@ abstract class UserRepository{
   Future<void> setOnBoardingComplete();
 
   Future<bool> hasOnBoardingComplete();
+
+  Future<void> updateAccountInformation({required String userId, required String name, String? photoUrl});
+
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }
