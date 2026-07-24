@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="lib/assets/images/Uangin..svg" alt="Uangin Logo" width="120" />
+  <img src="lib/assets/icons/logo_with_background.png" alt="Uangin Logo" width="120" />
   <h1>Uangin</h1>
   <p>A personal allowance and expense tracker built with Flutter & Firebase</p>
 
