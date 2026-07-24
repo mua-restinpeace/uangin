@@ -28,7 +28,10 @@ class FirebaseUserRepo implements UserRepository {
         return Stream.value(null);
       }
 
-      return userCollection.doc(firebaseUser.uid).snapshots().map<MyUser?>((snapshot) {
+      return userCollection
+          .doc(firebaseUser.uid)
+          .snapshots()
+          .map<MyUser?>((snapshot) {
         if (!snapshot.exists || snapshot.data() == null) {
           log('User document does not exist for: ${firebaseUser.uid}');
           return null;
@@ -190,5 +193,67 @@ class FirebaseUserRepo implements UserRepository {
   Future<void> setOnBoardingComplete() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+  }
+
+  @override
+  Future<void> updateAccountInformation({
+    required String userId,
+    required String name,
+    String? photoUrl,
+  }) async {
+    try {
+      final updates = <String, dynamic>{'name': name.trim()};
+
+      // update photo url if a new one was provided to avoid overwriting the existing one
+      if (photoUrl != null) {
+        updates['photoUrl'] = photoUrl;
+      }
+
+      await userCollection.doc(userId).update(updates);
+      log('account info updated for: $userId');
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updatePassword(
+      {required String currentPassword, required String newPassword}) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw Exception('No user signed in');
+      if (currentUser.email == null) throw Exception('User has no email');
+
+      // reauthenticate to refresh sessions
+      final credential = EmailAuthProvider.credential(
+        email: currentUser.email!,
+        password: currentPassword,
+      );
+      await currentUser.reauthenticateWithCredential(credential);
+
+      await currentUser.updatePassword(newPassword);
+      log('Password updated for: ${currentUser.uid}');
+    } on FirebaseAuthException catch (e) {
+      log('Firebase auth error updating password: ${e.code}');
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          throw Exception('Current password is incorrect');
+        case 'weak-password':
+          throw Exception('New password is too weak. Use at least 8 character');
+        case 'requires-recent-login':
+          throw Exception('Session expired. Please log out and sign in again');
+        case 'too-many-request':
+          throw Exception(
+              'Too many attempts. Please wait a moment and try again');
+        default:
+          throw Exception('Something went wrong. Please try again');
+      }
+    } catch (e) {
+      log('error updating password: $e');
+      rethrow;
+    }
   }
 }
