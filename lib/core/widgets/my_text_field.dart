@@ -13,20 +13,25 @@ class MyTextField extends StatelessWidget {
   final void Function(String?)? onChange;
   final VoidCallback? onTap;
   final FocusNode? focusNode;
+  final bool readOnly;
+  final bool enabled;
 
-  const MyTextField(
-      {super.key,
-      required this.textEditingController,
-      required this.hintText,
-      this.isObscureText = false,
-      this.prefixIcon,
-      this.sufixIcon,
-      this.errorMsg,
-      this.textInputType = TextInputType.text,
-      this.validator,
-      this.onChange,
-      this.onTap,
-      this.focusNode});
+  const MyTextField({
+    super.key,
+    required this.textEditingController,
+    required this.hintText,
+    this.isObscureText = false,
+    this.prefixIcon,
+    this.sufixIcon,
+    this.errorMsg,
+    this.textInputType = TextInputType.text,
+    this.validator,
+    this.onChange,
+    this.onTap,
+    this.focusNode,
+    this.readOnly = false,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,8 @@ class MyTextField extends StatelessWidget {
         onChanged: onChange,
         focusNode: focusNode,
         onTap: onTap,
+        readOnly: readOnly,
+        enabled: enabled,
         cursorColor: MyColors.onPrimary,
         decoration: InputDecoration(
             errorText: errorMsg,
@@ -60,7 +67,6 @@ class MyTextField extends StatelessWidget {
             border: _border(MyColors.lightGrey),
             enabledBorder: _border(MyColors.lightGrey),
             focusedBorder: _border(MyColors.grey)));
-            
   }
 
   OutlineInputBorder _border(Color color) {

@@ -15,6 +15,7 @@ import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/custom_linear_progress_bar.dart';
 import 'package:uangin/core/widgets/my_button.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
+import 'package:uangin/core/widgets/profile_avatar.dart';
 import 'package:uangin/core/widgets/transaction/transaction_item.dart';
 import 'package:uangin/features/add_allowance/views/add_allowance_screen.dart';
 import 'package:uangin/features/add_saving_goals/views/add_saving_goals_screen.dart';
@@ -23,6 +24,7 @@ import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_sa
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
 import 'package:uangin/features/transaction_records/views/transaction_records_screen.dart';
 import 'package:uangin/features/wallet/views/wallet_screen.dart';
+import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -94,10 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (state is GetUserLoading) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (state is GetUserSuccess) {
-                        return _buildHeader(context, state.user.name);
+                        return _buildHeader(state.user, context);
                       }
 
-                      return _buildHeader(context, '');
+                      return const SizedBox.shrink();
                     },
                   ),
                   const SizedBox(
@@ -150,19 +152,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, String name) {
+  Widget _buildHeader(MyUser user, BuildContext context) {
     return Row(
       children: [
-        SvgPicture.asset(
-          'lib/assets/icons/profile.svg',
-          width: 40,
-          height: 40,
+        ProfileAvatar(
+          user: user,
+          radius: 24,
+          fontSize: 16,
         ),
         const SizedBox(
           width: 12,
         ),
         Text(
-          'Hi, $name',
+          'Hi, ${user.name}',
           style:
               Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 20),
         ),
@@ -233,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showCurrentAllowance
                     ? Text(
                         allowanceRemaining.output.nonSymbol.toString(),
-                        style: currentAllowance > 0
+                        style: currentAllowance >= 0
                             ? Theme.of(context)
                                 .textTheme
                                 .displayLarge

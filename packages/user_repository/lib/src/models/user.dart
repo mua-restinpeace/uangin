@@ -5,6 +5,7 @@ class MyUser extends Equatable {
   String userId;
   String name;
   String email;
+  String photoUrl;
   double currentAllowance;
   double totalSaving;
   DateTime? lastAllowanceDate;
@@ -14,20 +15,36 @@ class MyUser extends Equatable {
       {required this.userId,
       required this.email,
       required this.name,
+      this.photoUrl = '',
       this.currentAllowance = 0.0,
       this.totalSaving = 0.0,
       this.lastAllowanceDate,
       required this.goalsAchieved});
 
-  static final empty =
-      MyUser(userId: '', email: '', name: '', currentAllowance: 0.0, totalSaving: 0.0, lastAllowanceDate: null, goalsAchieved: 0);
+  static final empty = MyUser(
+      userId: '',
+      email: '',
+      name: '',
+      currentAllowance: 0.0,
+      totalSaving: 0.0,
+      lastAllowanceDate: null,
+      goalsAchieved: 0,
+      photoUrl: '');
 
   bool get isEmpty => this == MyUser.empty;
   bool get isNotEmpty => !isEmpty;
+  bool get hasPhotoUrl => photoUrl.isNotEmpty;
 
   UserEntity toEnity() {
     return UserEntity(
-        userId: userId, email: email, name: name, currentAllowance: currentAllowance, totalSaving: totalSaving, lastAllowanceDate: lastAllowanceDate, goalsAchieved: goalsAchieved);
+        userId: userId,
+        email: email,
+        name: name,
+        photoUrl: photoUrl,
+        currentAllowance: currentAllowance,
+        totalSaving: totalSaving,
+        lastAllowanceDate: lastAllowanceDate,
+        goalsAchieved: goalsAchieved);
   }
 
   static MyUser fromEntity(UserEntity entity) {
@@ -35,6 +52,7 @@ class MyUser extends Equatable {
         userId: entity.userId,
         email: entity.email,
         name: entity.name,
+        photoUrl: entity.photoUrl,
         currentAllowance: entity.currentAllowance,
         totalSaving: entity.totalSaving,
         lastAllowanceDate: entity.lastAllowanceDate,
@@ -43,9 +61,18 @@ class MyUser extends Equatable {
 
   @override
   String toString() {
-    return 'User: $userId, $name, $email, $currentAllowance, $totalSaving, $lastAllowanceDate, $goalsAchieved';
+    return 'User: $userId, $name, $email, $currentAllowance, $totalSaving, $lastAllowanceDate, $goalsAchieved, hasPhoto: $hasPhotoUrl';
   }
 
   @override
-  List<Object?> get props => [userId, name, email, currentAllowance, totalSaving, lastAllowanceDate, goalsAchieved];
+  List<Object?> get props => [
+        userId,
+        name,
+        email,
+        photoUrl,
+        currentAllowance,
+        totalSaving,
+        lastAllowanceDate,
+        goalsAchieved
+      ];
 }
