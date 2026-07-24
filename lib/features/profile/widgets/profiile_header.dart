@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:uangin/core/theme/colors.dart';
+import 'package:uangin/core/widgets/profile_avatar.dart';
 import 'package:user_repository/user_repository.dart';
 
 class ProfileHeader extends StatelessWidget {
@@ -69,7 +67,7 @@ class ProfileHeader extends StatelessWidget {
                     width: 8,
                   ),
                 ),
-                child: _buildAvatar(user, context)
+                child: ProfileAvatar(user: user,)
               ),
             ),
           ),
@@ -135,31 +133,6 @@ class ProfileHeader extends StatelessWidget {
             ),
           )
         ],
-      ),
-    );
-  }
-
-  Widget _buildAvatar(MyUser user, BuildContext context) {
-    if (user.hasPhotoUrl) {
-      return CircleAvatar(
-        radius: 56,
-        backgroundImage: MemoryImage(base64Decode(user.photoUrl)),
-      );
-    }
-
-    final initials = user.name.isNotEmpty
-        ? user.name.trim().split(' ').map((e) => e[0]).take(2).join()
-        : '?';
-
-    return CircleAvatar(
-      radius: 56,
-      backgroundColor: MyColors.primary,
-      child: Text(
-        initials.toUpperCase(),
-        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontSize: 32,
-              color: MyColors.onPrimary,
-            ),
       ),
     );
   }

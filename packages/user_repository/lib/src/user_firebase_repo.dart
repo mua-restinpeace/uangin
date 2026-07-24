@@ -216,4 +216,44 @@ class FirebaseUserRepo implements UserRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> updatePassword(
+      {required String currentPassword, required String newPassword}) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw Exception('No user signed in');
+      if (currentUser.email == null) throw Exception('User has no email');
+
+      // reauthenticate to refresh sessions
+      final credential = EmailAuthProvider.credential(
+        email: currentUser.email!,
+        password: currentPassword,
+      );
+      await currentUser.reauthenticateWithCredential(credential);
+
+      await currentUser.updatePassword(newPassword);
+      log('Password updated for: ${currentUser.uid}');
+    } on FirebaseAuthException catch (e) {
+      log('Firebase auth error updating password: ${e.code}');
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          throw Exception('Current password is incorrect');
+        case 'weak-password':
+          throw Exception('New password is too weak. Use at least 8 character');
+        case 'requires-recent-login':
+          throw Exception('Session expired. Please log out and sign in again');
+        case 'too-many-request':
+          throw Exception(
+              'Too many attempts. Please wait a moment and try again');
+        default:
+          throw Exception('Something went wrong. Please try again');
+      }
+    } catch (e) {
+      log('error updating password: $e');
+      rethrow;
+    }
+  }
 }

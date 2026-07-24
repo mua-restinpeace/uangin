@@ -124,7 +124,9 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             title: 'Developer',
             children: [
               InfoRow(icon: 'lib/assets/icons/person.svg', label: 'Muuaaa'),
-              Divider(color: MyColors.lightGrey),
+              Divider(
+                color: MyColors.lightGrey,
+              ),
               InfoRow(
                   icon: 'lib/assets/icons/mail.svg',
                   label: 'disinilohaku@gmail.com')

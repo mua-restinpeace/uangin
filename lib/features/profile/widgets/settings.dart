@@ -5,7 +5,10 @@ import 'package:uangin/features/about_us/views/about_us_screen.dart';
 import 'package:uangin/features/account_information/views/account_information_screen.dart';
 import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:uangin/features/help_center/views/help_center_screeen.dart';
+import 'package:uangin/features/notifiicatiion_setting/views/notification_screen.dart';
+import 'package:uangin/features/password_and_security/views/password_security_screen.dart';
 import 'package:uangin/features/profile/widgets/setting_item.dart';
+import 'package:uangin/features/theme/views/theme_screen.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -55,7 +58,14 @@ class Settings extends StatelessWidget {
                 SettingItem(
                   name: 'Password & Security',
                   icon: 'lib/assets/icons/lock-invert.svg',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PasswordSecurityScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(
                   height: 4,
@@ -63,7 +73,14 @@ class Settings extends StatelessWidget {
                 SettingItem(
                   name: 'Notification',
                   icon: 'lib/assets/icons/bell-transparent.svg',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -95,7 +112,14 @@ class Settings extends StatelessWidget {
                 SettingItem(
                   name: 'Theme',
                   icon: 'lib/assets/icons/color-pallete.svg',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ThemeScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(
                   height: 4,

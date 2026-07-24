@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/core/widgets/my_text_field.dart';
+import 'package:uangin/core/widgets/profile_avatar.dart';
 import 'package:uangin/features/account_information/blocs/update_account_info/update_account_info_bloc.dart';
-import 'package:user_repository/user_repository.dart';
 
 class AccountInformationScreen extends StatefulWidget {
   const AccountInformationScreen({super.key});
@@ -231,7 +231,13 @@ class _AccountInformationScreenState extends State<AccountInformationScreen> {
                                     width: 8,
                                   ),
                                 ),
-                                child: _buildAvatar(user),
+                                child: _newPhotoBytes != null
+                                    ? CircleAvatar(
+                                        radius: 56,
+                                        backgroundImage:
+                                            MemoryImage(_newPhotoBytes!),
+                                      )
+                                    : ProfileAvatar(user: user),
                               ),
                             ),
                           ),
@@ -389,38 +395,6 @@ class _AccountInformationScreenState extends State<AccountInformationScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildAvatar(MyUser user) {
-    if (_newPhotoBytes != null) {
-      return CircleAvatar(
-        radius: 56,
-        backgroundImage: MemoryImage(_newPhotoBytes!),
-      );
-    }
-
-    if (user.hasPhotoUrl) {
-      return CircleAvatar(
-        radius: 56,
-        backgroundImage: MemoryImage(base64Decode(user.photoUrl)),
-      );
-    }
-
-    final initials = user.name.isNotEmpty
-        ? user.name.trim().split(' ').map((e) => e[0]).take(2).join()
-        : '?';
-
-    return CircleAvatar(
-      radius: 56,
-      backgroundColor: MyColors.primary,
-      child: Text(
-        initials.toUpperCase(),
-        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontSize: 32,
-              color: MyColors.onPrimary,
-            ),
-      ),
     );
   }
 }

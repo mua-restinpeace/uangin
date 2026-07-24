@@ -16,6 +16,7 @@ import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_tr
 import 'package:uangin/features/onBoarding/views/on_boarding_screen.dart';
 import 'package:uangin/features/onBoarding/views/splash_screen.dart';
 import 'package:uangin/core/theme/themes.dart';
+import 'package:uangin/features/password_and_security/blocs/update_password/update_password_bloc.dart';
 import 'package:uangin/features/transaction_records/blocs/get_filtered_transaction/get_filtered_transaction_bloc.dart';
 import 'package:uangin/main_scaffold.dart';
 import 'package:user_repository/user_repository.dart';
@@ -84,7 +85,10 @@ class _MyAppViewState extends State<MyAppView> {
         BlocProvider(
           create: (context) =>
               UpdateAccountInfoBloc(context.read<UserRepository>()),
-        )
+        ),
+        BlocProvider(
+            create: (context) =>
+                UpdatePasswordBloc(context.read<UserRepository>()))
       ],
       child: MaterialApp(
           title: 'Uangin',

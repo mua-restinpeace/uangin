@@ -147,6 +147,7 @@ flutter:
     - lib/assets/icons/archive.svg
     - lib/assets/icons/cevron-right-circle.svg
     - lib/assets/icons/logo.svg
+    - lib/assets/icons/info-circle.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
