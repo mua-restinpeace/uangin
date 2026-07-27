@@ -30,7 +30,9 @@ class MyAppView extends StatefulWidget {
 
 class _MyAppViewState extends State<MyAppView> {
   bool _splashScren = true;
-  bool _getUserTriggerd = false;
+
+  final _authScreenKey = GlobalKey();
+  final _mainScaffoldKey = GlobalKey();
 
   @override
   void initState() {
@@ -96,10 +98,22 @@ class _MyAppViewState extends State<MyAppView> {
           theme: lightTheme,
           home: BlocListener<AuthenticationBloc, AuthenticationState>(
             listener: (context, state) {
-              if (state.status == AuthenticationStatus.authenticated &&
-                  !_getUserTriggerd) {
+              if (state.status == AuthenticationStatus.authenticated) {
                 context.read<GetUserBloc>().add(const GetUser());
-                _getUserTriggerd = true;
+              }
+
+              if (state.status == AuthenticationStatus.unauthenticated) {
+                context.read<GetBudgetsBloc>().add(ResetBudget());
+                context
+                    .read<GetRecentTransactionsBloc>()
+                    .add(ResetRecentTransaction());
+                context.read<ExpenseSummaryBloc>().add(ResetExpenseSummary());
+                context
+                    .read<GetTotalAllocatedBudgetsBloc>()
+                    .add(ResetTotalAllocatedBudget());
+                context
+                    .read<GetActiveSavingGoalsBloc>()
+                    .add(ResetActiveGoals());
               }
             },
             child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -109,11 +123,15 @@ class _MyAppViewState extends State<MyAppView> {
               }
 
               if (state.status == AuthenticationStatus.authenticated) {
-                return const MainScaffold();
+                return MainScaffold(
+                  key: _mainScaffoldKey,
+                );
               }
 
               if (state.status == AuthenticationStatus.unauthenticated) {
-                return const AuthScreen();
+                return AuthScreen(
+                  key: _authScreenKey,
+                );
               }
 
               return const OnBoardingScreen();

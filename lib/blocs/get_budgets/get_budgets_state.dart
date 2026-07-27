@@ -2,7 +2,7 @@ part of 'get_budgets_bloc.dart';
 
 sealed class GetBudgetsState extends Equatable {
   const GetBudgetsState();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -10,6 +10,7 @@ sealed class GetBudgetsState extends Equatable {
 final class GetBudgetsInitial extends GetBudgetsState {}
 
 final class GetBudgetsLoading extends GetBudgetsState {}
+
 final class GetBudgetsFailure extends GetBudgetsState {
   final String? errorMsg;
 
@@ -18,6 +19,7 @@ final class GetBudgetsFailure extends GetBudgetsState {
   @override
   List<Object?> get props => [errorMsg];
 }
+
 final class GetBudgetsSuccess extends GetBudgetsState {
   final List<Budgets> budgetList;
 

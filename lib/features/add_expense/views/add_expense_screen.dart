@@ -144,7 +144,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                           builder: (context, state) {
                             if (state is AddExpenseLoading) {
                               return const Center(
-                                child: CircularProgressIndicator(color: MyColors.black, strokeCap: StrokeCap.round,),
+                                child: CircularProgressIndicator(
+                                  color: MyColors.black,
+                                  strokeCap: StrokeCap.round,
+                                ),
                               );
                             }
                             return Builder(builder: (context) {

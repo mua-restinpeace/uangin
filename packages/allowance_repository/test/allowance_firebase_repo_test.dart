@@ -64,16 +64,6 @@ void main() {
 
         expect(result, 75000);
       });
-
-      // test('udpateCurrentAllowance updates user currentAllowance', () async {
-      //   await seedUser(currentAllowance: 10000);
-
-        // await repo.udpateCurrentAllowance(userId, 50000);
-
-      //   final result = await repo.getCurrentAllowance(userId);
-
-      //   expect(result, 50000);
-      // });
     });
 
     group('allowance operations', () {
@@ -108,8 +98,7 @@ void main() {
           expect(allowanceData['notes'], 'Weekly allowance');
           expect(allowanceData['date'], isA<Timestamp>());
 
-          final userDoc =
-              await firestore.collection('users').doc(userId).get();
+          final userDoc = await firestore.collection('users').doc(userId).get();
           final userData = userDoc.data()!;
 
           expect(userData['currentAllowance'], 150000);
@@ -145,8 +134,7 @@ void main() {
           expect(allowanceData['savedAmount'], 50000);
           expect(allowance.savedAmount, 50000);
 
-          final userDoc =
-              await firestore.collection('users').doc(userId).get();
+          final userDoc = await firestore.collection('users').doc(userId).get();
           final userData = userDoc.data()!;
 
           expect(userData['currentAllowance'], 100000);
@@ -155,7 +143,8 @@ void main() {
         },
       );
 
-      test('getAllowances returns allowances sorted newest to oldest', () async {
+      test('getAllowances returns allowances sorted newest to oldest',
+          () async {
         await seedUser();
 
         await repo.addAllowance(
@@ -205,6 +194,108 @@ void main() {
         expect(latest, isNotNull);
         expect(latest!.amount, 250000);
         expect(latest.savedAmount, 100000);
+      });
+
+      test(
+          'updateCurrentAllowance creates correction entry and sets target balance',
+          () async {
+        await seedUser(currentAllowance: 150000, totalSaving: 0);
+
+        final correction = await repo.updateCurrentAllowance(
+          userId: userId,
+          targetAmount: 120000,
+          date: DateTime(2026, 6, 26),
+          notes: 'Manual correction',
+        );
+
+        expect(correction.amount, -30000);
+        expect(correction.type, AllowanceType.correction);
+        expect(correction.notes, 'Manual correction');
+
+        final userDoc = await firestore.collection('users').doc(userId).get();
+        final userData = userDoc.data()!;
+
+        expect(userData['currentAllowance'], 120000);
+        expect(userData['lastAllowanceDate'], isA<Timestamp>());
+
+        final allowanceDocs = await firestore
+            .collection('users')
+            .doc(userId)
+            .collection('allowances')
+            .get();
+
+        expect(allowanceDocs.docs.length, 1);
+
+        final data = allowanceDocs.docs.first.data();
+
+        expect(data['amount'], -30000);
+        expect(data['type'], 'correction');
+        expect(data['date'], isA<Timestamp>());
+      });
+
+      test(
+          'updateCurrentAllowance does not write correction entry when target is unchanged',
+          () async {
+        await seedUser(currentAllowance: 150000);
+
+        final correction = await repo.updateCurrentAllowance(
+          userId: userId,
+          targetAmount: 150000,
+          date: DateTime(2026, 6, 26),
+        );
+
+        expect(correction.allowanceId, '');
+        expect(correction.amount, 0);
+        expect(correction.type, AllowanceType.correction);
+
+        final allowanceDocs = await firestore
+            .collection('users')
+            .doc(userId)
+            .collection('allowances')
+            .get();
+
+        expect(allowanceDocs.docs, isEmpty);
+      });
+
+      test(
+          'getAllowanceByDateRange returns allowances inside range sorted newest first',
+          () async {
+        await seedUser();
+
+        await repo.addAllowance(
+          userId: userId,
+          amount: 100000,
+          currentAllowance: 0,
+          addToSaving: false,
+          date: DateTime(2026, 6, 1),
+        );
+
+        await repo.addAllowance(
+          userId: userId,
+          amount: 200000,
+          currentAllowance: 0,
+          addToSaving: false,
+          date: DateTime(2026, 6, 15),
+        );
+
+        await repo.addAllowance(
+          userId: userId,
+          amount: 300000,
+          currentAllowance: 0,
+          addToSaving: false,
+          date: DateTime(2026, 7, 1),
+        );
+
+        final result = await repo
+            .getAllowanceByDateRange(
+              userId,
+              DateTime(2026, 6, 10),
+              DateTime(2026, 6, 30, 23, 59, 59),
+            )
+            .first;
+
+        expect(result.length, 1);
+        expect(result.first.amount, 200000);
       });
     });
 
@@ -473,8 +564,9 @@ void main() {
           date: DateTime(2026, 6, 11),
         );
 
-        final result =
-            await repo.getTransactionByBudget(userId, foodBudget.budgetId).first;
+        final result = await repo
+            .getTransactionByBudget(userId, foodBudget.budgetId)
+            .first;
 
         expect(result.length, 1);
         expect(result.first.budgetId, foodBudget.budgetId);
@@ -529,7 +621,8 @@ void main() {
         expect(result.first.amount, 20000);
       });
 
-      test('updateTransaction adjusts budget and currentAllowance by difference',
+      test(
+          'updateTransaction adjusts budget and currentAllowance by difference',
           () async {
         await seedUser(currentAllowance: 500000);
 
@@ -572,7 +665,8 @@ void main() {
         expect(currentAllowance, 460000);
       });
 
-      test('deleteTransaction removes transaction and restores budget + allowance',
+      test(
+          'deleteTransaction removes transaction and restores budget + allowance',
           () async {
         await seedUser(currentAllowance: 500000);
 
@@ -710,9 +804,7 @@ void main() {
         expect(goalData['currentAmount'], 500000);
         expect(goalData['isComplete'], true);
 
-        // Your current repo writes millisecondsSinceEpoch here.
-        // If your SavingGoalEntity now expects Timestamp, change the repo to Timestamp.fromDate(DateTime.now()).
-        expect(goalData['completedDate'], isA<int>());
+        expect(goalData['completedDate'], isA<Timestamp>());
 
         final userDoc = await firestore.collection('users').doc(userId).get();
         expect(userDoc.data()!['goalsAchieved'], 1);
@@ -757,6 +849,63 @@ void main() {
             .get();
 
         expect(doc.exists, false);
+      });
+
+      test('updateSavingGoalProgress deducts allocated amount from totalSaving',
+          () async {
+        await seedUser(currentAllowance: 500000, totalSaving: 500000);
+
+        final goal = await repo.createdSavingGoal(
+          userId: userId,
+          name: 'Emergency Fund',
+          icon: 'wallet',
+          targetAmount: 1000000,
+        );
+
+        final excess = await repo.updateSavingGoalProgress(
+          userId,
+          goal.goalId,
+          250000,
+        );
+
+        expect(excess, 0);
+
+        final userDoc = await firestore.collection('users').doc(userId).get();
+        expect(userDoc.data()!['totalSaving'], 250000);
+      });
+
+      test(
+          'updateSavingGoalProgress returns excess and only deducts remaining target amount',
+          () async {
+        await seedUser(currentAllowance: 1000000, totalSaving: 1000000);
+
+        final goal = await repo.createdSavingGoal(
+          userId: userId,
+          name: 'Phone',
+          icon: 'phone',
+          targetAmount: 500000,
+        );
+
+        final excess = await repo.updateSavingGoalProgress(
+          userId,
+          goal.goalId,
+          700000,
+        );
+
+        expect(excess, 200000);
+
+        final goalDoc = await firestore
+            .collection('users')
+            .doc(userId)
+            .collection('savingGoals')
+            .doc(goal.goalId)
+            .get();
+
+        expect(goalDoc.data()!['currentAmount'], 500000);
+        expect(goalDoc.data()!['isComplete'], true);
+
+        final userDoc = await firestore.collection('users').doc(userId).get();
+        expect(userDoc.data()!['totalSaving'], 500000);
       });
     });
 
@@ -808,7 +957,8 @@ void main() {
         expect(total, 30000);
       });
 
-      test('getTotalAllocatedBudgets returns sum of allocated budgets', () async {
+      test('getTotalAllocatedBudgets returns sum of allocated budgets',
+          () async {
         await seedUser();
 
         await seedBudget(name: 'Food', allocatedAmount: 300000);
@@ -819,7 +969,8 @@ void main() {
         expect(total, 450000);
       });
 
-      test('getSpendingBreakdown groups total expense by budget name', () async {
+      test('getSpendingBreakdown groups total expense by budget name',
+          () async {
         await seedUser(currentAllowance: 1000000);
 
         final foodBudget = await seedBudget(name: 'Food');

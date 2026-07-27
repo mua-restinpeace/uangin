@@ -30,6 +30,12 @@ class AuthenticationBloc
       emit(AuthenticationState.authenticated(event.user));
     });
 
+    on<AuthenticationLogoutRequested>(
+      (event, emit) async {
+        await userRepository.logout();
+      },
+    );
+
     on<AuthenticatonLogoutRequest>((event, emit) async {
       final hasSeenOnBoarding = await userRepository.hasOnBoardingComplete();
       if (hasSeenOnBoarding) {

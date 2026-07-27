@@ -9,13 +9,7 @@ import 'package:flutter/material.dart';
 part 'expense_summary_event.dart';
 part 'expense_summary_state.dart';
 
-enum SummaryFilter{
-  thisWeek,
-  lastWeek,
-  thisMonth,
-  lastMonth,
-  thisYear
-}
+enum SummaryFilter { thisWeek, lastWeek, thisMonth, lastMonth, thisYear }
 
 class ExpenseSummaryBloc
     extends Bloc<ExpenseSummaryEvent, ExpenseSummaryState> {
@@ -50,8 +44,7 @@ class ExpenseSummaryBloc
         });
 
         _breakdownSubscription = _allowanceRepository
-            .getSpendingBreakdown(
-                event.userId, dateRange.start, dateRange.end)
+            .getSpendingBreakdown(event.userId, dateRange.start, dateRange.end)
             .listen((breakdown) {
           currentBreakdown = breakdown;
 
@@ -71,9 +64,20 @@ class ExpenseSummaryBloc
           totalSpent: event.totalSpent, breakdown: event.breakdown));
     });
 
-    
-}
-DateTimeRange _getDateRange(SummaryFilter filter) {
+    on<ResetExpenseSummary>(
+      (event, emit) async {
+        await _totalSpentSubscription?.cancel();
+        await _breakdownSubscription?.cancel();
+
+        _totalSpentSubscription = null;
+        _breakdownSubscription = null;
+
+        emit(ExpenseSummaryInitial());
+      },
+    );
+  }
+
+  DateTimeRange _getDateRange(SummaryFilter filter) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
@@ -113,4 +117,4 @@ DateTimeRange _getDateRange(SummaryFilter filter) {
                 .subtract(const Duration(seconds: 1)));
     }
   }
-  }
+}

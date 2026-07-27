@@ -24,3 +24,5 @@ class BudgetUpdate extends GetBudgetsEvent {
   @override
   List<Object> get props => [budgetList];
 }
+
+class ResetBudget extends GetBudgetsEvent {}

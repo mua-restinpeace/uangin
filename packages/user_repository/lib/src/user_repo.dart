@@ -1,6 +1,6 @@
 import 'package:user_repository/src/models/models.dart';
 
-abstract class UserRepository{
+abstract class UserRepository {
   Stream<MyUser?> get user;
 
   Future<MyUser> signUp(MyUser user, String password);
@@ -15,7 +15,8 @@ abstract class UserRepository{
 
   Future<bool> hasOnBoardingComplete();
 
-  Future<void> updateAccountInformation({required String userId, required String name, String? photoUrl});
+  Future<void> updateAccountInformation(
+      {required String userId, required String name, String? photoUrl});
 
   Future<void> updatePassword({
     required String currentPassword,

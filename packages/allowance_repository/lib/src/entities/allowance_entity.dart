@@ -16,7 +16,7 @@ class AllowanceEntity {
       required this.date,
       this.savedAmount = 0.0,
       this.notes,
-      this.type= 'topUp'});
+      this.type = 'topUp'});
 
   Map<String, Object?> toJSON() {
     return {
@@ -42,7 +42,7 @@ class AllowanceEntity {
     );
   }
 
-    static DateTime? _dateFromFirebase(dynamic value) {
+  static DateTime? _dateFromFirebase(dynamic value) {
     if (value == null) return null;
     if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;

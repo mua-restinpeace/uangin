@@ -20,7 +20,8 @@ class GetTotalSpentBloc extends Bloc<GetTotalSpentEvent, GetTotalSpentState> {
 
         double? currentTotal;
         _totalSpentSubscription = _allowanceRepository
-            .getTotalSpentThisPeriod(event.userId, event.periodStart, event.periodEnd)
+            .getTotalSpentThisPeriod(
+                event.userId, event.periodStart, event.periodEnd)
             .listen((total) {
           currentTotal = total;
 

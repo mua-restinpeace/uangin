@@ -5,7 +5,11 @@ class MyButton extends StatelessWidget {
   final VoidCallback onTap;
   final Widget content;
   final EdgeInsets padding;
-  const MyButton({required this.onTap, required this.content, this.padding = const EdgeInsets.all(16), super.key});
+  const MyButton(
+      {required this.onTap,
+      required this.content,
+      this.padding = const EdgeInsets.all(16),
+      super.key});
 
   @override
   Widget build(BuildContext context) {

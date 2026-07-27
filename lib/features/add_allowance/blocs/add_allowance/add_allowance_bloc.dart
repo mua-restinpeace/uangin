@@ -21,8 +21,8 @@ class AddAllowanceBloc extends Bloc<AddAllowanceEvent, AddAllowanceState> {
             date: DateTime.now(),
             notes: event.notes);
 
-          log('allowance added: ${addAllowance.allowanceId}');
-          emit(AddAllowanceSuccess());
+        log('allowance added: ${addAllowance.allowanceId}');
+        emit(AddAllowanceSuccess());
       } catch (e) {
         log('add allowance error: $e');
         emit(AddAllowanceFailure(e.toString()));

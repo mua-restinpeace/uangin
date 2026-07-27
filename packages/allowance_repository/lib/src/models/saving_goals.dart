@@ -2,19 +2,19 @@ import 'package:allowance_repository/src/entities/saving_goal_entity.dart';
 import 'package:equatable/equatable.dart';
 
 class SavingGoals extends Equatable {
-  String goalId;
-  String userId;
-  String name;
-  String? description;
-  String? icon;
-  double targetAmount;
-  double currentAmount;
-  DateTime? createdDate;
-  DateTime? targetDate;
-  bool isComplete;
-  DateTime? completedDate;
+  final String goalId;
+  final String userId;
+  final String name;
+  final String? description;
+  final String? icon;
+  final double targetAmount;
+  final double currentAmount;
+  final DateTime? createdDate;
+  final DateTime? targetDate;
+  final bool isComplete;
+  final DateTime? completedDate;
 
-  SavingGoals({
+  const SavingGoals({
     required this.goalId,
     required this.userId,
     required this.name,
@@ -28,7 +28,7 @@ class SavingGoals extends Equatable {
     this.completedDate,
   });
 
-  static final empty = SavingGoals(
+  static const empty = SavingGoals(
       goalId: '',
       userId: '',
       name: '',

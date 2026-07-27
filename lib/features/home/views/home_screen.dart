@@ -547,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SpendingAnalysisScreen(),
+                          builder: (context) => const SpendingAnalysisScreen(),
                         ));
                   },
                   child: Container(

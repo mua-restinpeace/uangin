@@ -4,15 +4,15 @@ import 'package:equatable/equatable.dart';
 enum AllowanceType { topUp, correction }
 
 class Allowances extends Equatable {
-  String allowanceId;
-  String userId;
-  double amount;
-  double savedAmount;
-  DateTime? date;
-  String? notes;
-  AllowanceType type;
+  final String allowanceId;
+  final String userId;
+  final double amount;
+  final double savedAmount;
+  final DateTime? date;
+  final String? notes;
+  final AllowanceType type;
 
-  Allowances(
+  const Allowances(
       {required this.allowanceId,
       required this.userId,
       required this.amount,
@@ -21,7 +21,7 @@ class Allowances extends Equatable {
       this.notes,
       this.type = AllowanceType.topUp});
 
-  static final empty =
+  static const empty =
       Allowances(allowanceId: '', userId: '', amount: 0, date: null);
 
   bool get isEmpty => this == Allowances.empty;

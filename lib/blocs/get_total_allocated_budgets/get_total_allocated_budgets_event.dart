@@ -7,7 +7,7 @@ sealed class GetTotalAllocatedBudgetsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetTotalAllocatedBudgets extends GetTotalAllocatedBudgetsEvent{
+class GetTotalAllocatedBudgets extends GetTotalAllocatedBudgetsEvent {
   final String userId;
 
   const GetTotalAllocatedBudgets(this.userId);
@@ -16,7 +16,7 @@ class GetTotalAllocatedBudgets extends GetTotalAllocatedBudgetsEvent{
   List<Object> get props => [userId];
 }
 
-class GetTotalAllocatedBudgetUpdated extends GetTotalAllocatedBudgetsEvent{
+class GetTotalAllocatedBudgetUpdated extends GetTotalAllocatedBudgetsEvent {
   final double totalAllocated;
 
   const GetTotalAllocatedBudgetUpdated(this.totalAllocated);
@@ -24,3 +24,5 @@ class GetTotalAllocatedBudgetUpdated extends GetTotalAllocatedBudgetsEvent{
   @override
   List<Object> get props => [totalAllocated];
 }
+
+class ResetTotalAllocatedBudget extends GetTotalAllocatedBudgetsEvent {}

@@ -33,6 +33,12 @@ class GetBudgetsBloc extends Bloc<GetBudgetsEvent, GetBudgetsState> {
     on<BudgetUpdate>((event, emit) {
       emit(GetBudgetsSuccess(event.budgetList));
     });
+
+    on<ResetBudget>((event, emit) async {
+      await _budgetSubscription?.cancel();
+      _budgetSubscription = null;
+      emit(GetBudgetsInitial());
+    });
   }
 
   @override

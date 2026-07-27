@@ -7,7 +7,7 @@ sealed class AllocateSavingsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AllocateSaving extends AllocateSavingsEvent{
+class AllocateSaving extends AllocateSavingsEvent {
   final String userId;
   final String goalId;
   final double amountToAdd;

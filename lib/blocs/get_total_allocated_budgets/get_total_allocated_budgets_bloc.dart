@@ -38,5 +38,14 @@ class GetTotalAllocatedBudgetsBloc
     on<GetTotalAllocatedBudgetUpdated>((event, emit) {
       emit(GetTotalAllocatedBudgetsSuccess(event.totalAllocated));
     });
+
+    on<ResetTotalAllocatedBudget>(
+      (event, emit) async {
+        await _totalAllocatedSubscription?.cancel();
+
+        _totalAllocatedSubscription = null;
+        emit(GetTotalAllocatedBudgetsInitial());
+      },
+    );
   }
 }

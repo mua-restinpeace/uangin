@@ -7,7 +7,7 @@ sealed class AddSavingGoalBlocEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AddSavingGoal extends AddSavingGoalBlocEvent{
+class AddSavingGoal extends AddSavingGoalBlocEvent {
   final String userId;
   final String name;
   final double targetAmount;

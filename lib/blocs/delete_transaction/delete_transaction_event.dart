@@ -7,7 +7,7 @@ sealed class DeleteTransactionEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class DeleteTransaction extends DeleteTransactionEvent{
+class DeleteTransaction extends DeleteTransactionEvent {
   final String userId;
   final String transactionId;
 

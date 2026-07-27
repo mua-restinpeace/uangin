@@ -7,7 +7,7 @@ sealed class GetActiveSavingGoalsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetActiveGoals extends GetActiveSavingGoalsEvent{
+class GetActiveGoals extends GetActiveSavingGoalsEvent {
   final String userId;
 
   const GetActiveGoals(this.userId);
@@ -16,7 +16,7 @@ class GetActiveGoals extends GetActiveSavingGoalsEvent{
   List<Object> get props => [userId];
 }
 
-class GetActiveGoalsUpdated extends GetActiveSavingGoalsEvent{
+class GetActiveGoalsUpdated extends GetActiveSavingGoalsEvent {
   final List<SavingGoals> goals;
 
   const GetActiveGoalsUpdated(this.goals);
@@ -24,3 +24,5 @@ class GetActiveGoalsUpdated extends GetActiveSavingGoalsEvent{
   @override
   List<Object> get props => [goals];
 }
+
+class ResetActiveGoals extends GetActiveSavingGoalsEvent {}

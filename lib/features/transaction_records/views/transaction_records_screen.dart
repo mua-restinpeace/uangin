@@ -55,8 +55,10 @@ class _TransactionRecordsScreenState extends State<TransactionRecordsScreen> {
           padding: const EdgeInsets.only(top: 12),
           child: Text(
             'Transaction Records',
-            style:
-                Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 20),
+            style: Theme.of(context)
+                .textTheme
+                .displayMedium
+                ?.copyWith(fontSize: 20),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -254,10 +256,11 @@ class _TransactionRecordsScreenState extends State<TransactionRecordsScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: TransactionList(
-                      context: context,
-                      transactions: transaction,
-                      budgets: budgets,
-                      dateFormat: 'hh.mm a',),
+                    context: context,
+                    transactions: transaction,
+                    budgets: budgets,
+                    dateFormat: 'hh.mm a',
+                  ),
                 ),
               ),
             )

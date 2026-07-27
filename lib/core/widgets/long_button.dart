@@ -11,16 +11,19 @@ class LongButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-            backgroundColor: MyColors.black,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(12))
-          ),
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 16, color: MyColors.white),
-        )),
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+              backgroundColor: MyColors.black,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12))),
+          child: Text(
+            text,
+            style: Theme.of(context)
+                .textTheme
+                .displayMedium
+                ?.copyWith(fontSize: 16, color: MyColors.white),
+          )),
     );
   }
 }

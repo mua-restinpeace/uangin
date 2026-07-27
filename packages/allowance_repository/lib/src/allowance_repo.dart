@@ -21,7 +21,8 @@ abstract class AllowanceRepository {
   });
   Stream<List<Allowances>> getAllowances(String userId);
   Future<Allowances?> getLatestAllowance(String userId);
-  Stream<List<Allowances>> getAllowanceByDateRange(String userId, DateTime startDate, DateTime endDate);
+  Stream<List<Allowances>> getAllowanceByDateRange(
+      String userId, DateTime startDate, DateTime endDate);
 
   // budget operations
   Future<Budgets> createBudget(

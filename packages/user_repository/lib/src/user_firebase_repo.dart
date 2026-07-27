@@ -12,13 +12,15 @@ import 'package:user_repository/src/user_repo.dart';
 class FirebaseUserRepo implements UserRepository {
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
-  final userCollection;
+  late final CollectionReference<Map<String, dynamic>> userCollection;
 
-  FirebaseUserRepo({FirebaseAuth? firebaseAuth, FirebaseFirestore? fireStore})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = fireStore ?? FirebaseFirestore.instance,
-        userCollection =
-            (fireStore ?? FirebaseFirestore.instance).collection('users');
+  FirebaseUserRepo({
+    FirebaseAuth? firebaseAuth,
+    FirebaseFirestore? firestore,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance {
+    userCollection = _firestore.collection('users');
+  }
 
   @override
   Stream<MyUser?> get user {
