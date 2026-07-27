@@ -7,7 +7,7 @@ sealed class GetRecentTransactionsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class GetRecentTransactions extends GetRecentTransactionsEvent{
+class GetRecentTransactions extends GetRecentTransactionsEvent {
   final String userId;
 
   const GetRecentTransactions(this.userId);
@@ -16,7 +16,7 @@ class GetRecentTransactions extends GetRecentTransactionsEvent{
   List<Object> get props => [userId];
 }
 
-class GetRecentTransactionUpdated extends GetRecentTransactionsEvent{
+class GetRecentTransactionUpdated extends GetRecentTransactionsEvent {
   final List<Transactions> transactionList;
 
   const GetRecentTransactionUpdated(this.transactionList);
@@ -24,3 +24,5 @@ class GetRecentTransactionUpdated extends GetRecentTransactionsEvent{
   @override
   List<Object?> get props => [transactionList];
 }
+
+class ResetRecentTransaction extends GetRecentTransactionsEvent {}

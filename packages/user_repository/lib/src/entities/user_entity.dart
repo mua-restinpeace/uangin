@@ -28,7 +28,9 @@ class UserEntity {
       'photoUrl': photoUrl,
       'currentAllowance': currentAllowance,
       'totalSaving': totalSaving,
-      'lastAllowanceDate': lastAllowanceDate != null ? Timestamp.fromDate(lastAllowanceDate!) : null,
+      'lastAllowanceDate': lastAllowanceDate != null
+          ? Timestamp.fromDate(lastAllowanceDate!)
+          : null,
       'goalsAchieved': goalsAchieved
     };
   }
@@ -38,14 +40,14 @@ class UserEntity {
         userId: (doc['userId'] as String),
         name: (doc['name'] as String),
         email: (doc['email'] as String),
-        photoUrl: (doc['photoUrl'] as String) ?? '',
+        photoUrl: (doc['photoUrl'] as String) ?? "",
         currentAllowance: (doc['currentAllowance'] as num?)?.toDouble() ?? 0.0,
         totalSaving: (doc['totalSaving'] as num?)?.toDouble() ?? 0.0,
         lastAllowanceDate: _dateFromFirebase(doc['lastAllowanceDate']),
         goalsAchieved: (doc['goalsAchieved'] as num?)?.toInt() ?? 0);
   }
 
-    static DateTime? _dateFromFirebase(dynamic value) {
+  static DateTime? _dateFromFirebase(dynamic value) {
     if (value == null) return null;
     if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;

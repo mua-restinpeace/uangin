@@ -2,18 +2,18 @@ import 'package:allowance_repository/src/entities/transaction_entity.dart';
 import 'package:equatable/equatable.dart';
 
 class Transactions extends Equatable {
-  String transactionId;
-  String userId;
-  String budgetId;
-  String budgetName;
-  String budgetIcon;
-  String budgetColor;
-  double amount;
-  DateTime? date;
-  String? description;
-  TransactionType? type;
+  final String transactionId;
+  final String userId;
+  final String budgetId;
+  final String budgetName;
+  final String budgetIcon;
+  final String budgetColor;
+  final double amount;
+  final DateTime? date;
+  final String? description;
+  final TransactionType? type;
 
-  Transactions(
+  const Transactions(
       {required this.transactionId,
       required this.userId,
       required this.budgetId,
@@ -25,7 +25,7 @@ class Transactions extends Equatable {
       this.description,
       this.type = TransactionType.expense});
 
-  static final empty = Transactions(
+  static const empty = Transactions(
       transactionId: '',
       userId: '',
       budgetId: '',
@@ -66,9 +66,8 @@ class Transactions extends Equatable {
         date: entity.date,
         description: entity.description,
         type: TransactionType.values.firstWhere(
-          (e) => e.toString().split('.').last == entity.type,
-          orElse: () => TransactionType.expense
-        ));
+            (e) => e.toString().split('.').last == entity.type,
+            orElse: () => TransactionType.expense));
   }
 
   @override

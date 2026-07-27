@@ -1,21 +1,19 @@
-
-
 import 'package:allowance_repository/src/entities/budget_entity.dart';
 import 'package:equatable/equatable.dart';
 
 class Budgets extends Equatable {
-  String budgetId;
-  String userId;
-  String name;
-  String icon;
-  String color;
-  double allocatedAmount;
-  double spentAmount;
-  DateTime? periodStart;
-  DateTime? periodEnd;
-  bool isActive;
+  final String budgetId;
+  final String userId;
+  final String name;
+  final String icon;
+  final String color;
+  final double allocatedAmount;
+  final double spentAmount;
+  final DateTime? periodStart;
+  final DateTime? periodEnd;
+  final bool isActive;
 
-  Budgets(
+  const Budgets(
       {required this.budgetId,
       required this.userId,
       required this.name,
@@ -27,7 +25,7 @@ class Budgets extends Equatable {
       required this.periodEnd,
       this.isActive = true});
 
-  static final empty = Budgets(
+  static const empty = Budgets(
       budgetId: '',
       userId: '',
       name: '',
@@ -73,8 +71,8 @@ class Budgets extends Equatable {
         isActive: entity.isActive);
   }
 
-  Budgets copyWith({
-      String? budgetId,
+  Budgets copyWith(
+      {String? budgetId,
       String? userId,
       String? name,
       String? icon,

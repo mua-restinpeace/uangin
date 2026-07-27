@@ -7,7 +7,7 @@ sealed class AllowanceHistoryEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetFilteredAllowance extends AllowanceHistoryEvent{
+class GetFilteredAllowance extends AllowanceHistoryEvent {
   final String userId;
   final AllowanceFilter filter;
 
@@ -17,7 +17,7 @@ class GetFilteredAllowance extends AllowanceHistoryEvent{
   List<Object> get props => [userId, filter];
 }
 
-class FilteredAllowanceUpdate extends AllowanceHistoryEvent{
+class FilteredAllowanceUpdate extends AllowanceHistoryEvent {
   final Map<String, List<Allowances>> groupedAllowance;
   final AllowanceFilter currentFilter;
 

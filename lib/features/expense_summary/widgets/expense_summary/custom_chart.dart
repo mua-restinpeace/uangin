@@ -31,7 +31,8 @@ class _CustomChartState extends State<CustomChart>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
 
     _curvedAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);

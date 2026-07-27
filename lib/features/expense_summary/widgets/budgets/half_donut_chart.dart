@@ -114,8 +114,8 @@ class _HalfDonutChartPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
-    canvas.drawArc(rect, startAngle, usedBudgetSweepAngle.value, false,
-        usedOutlinePaint);
+    canvas.drawArc(
+        rect, startAngle, usedBudgetSweepAngle.value, false, usedOutlinePaint);
 
     final usedBudgetPaint = Paint()
       ..color = Theme.of(context).colorScheme.primary

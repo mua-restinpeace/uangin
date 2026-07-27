@@ -7,7 +7,7 @@ sealed class GetFilteredTransactionEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetFilteredTransactions extends GetFilteredTransactionEvent{
+class GetFilteredTransactions extends GetFilteredTransactionEvent {
   final String userId;
   final TransactionFilter filter;
 
@@ -17,7 +17,7 @@ class GetFilteredTransactions extends GetFilteredTransactionEvent{
   List<Object> get props => [userId, filter];
 }
 
-class FilteredTransactionUpdate extends GetFilteredTransactionEvent{
+class FilteredTransactionUpdate extends GetFilteredTransactionEvent {
   final Map<String, List<Transactions>> groupedTransaction;
   final TransactionFilter currentFilter;
 

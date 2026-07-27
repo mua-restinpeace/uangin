@@ -5,13 +5,13 @@ sealed class GetUserEvent extends Equatable {
 
   @override
   List<Object?> get props => [];
-  
 }
+
 class GetUser extends GetUserEvent {
   const GetUser();
 }
 
-class GetUserUpdated extends GetUserEvent{
+class GetUserUpdated extends GetUserEvent {
   final MyUser? user;
 
   const GetUserUpdated(this.user);
@@ -19,4 +19,3 @@ class GetUserUpdated extends GetUserEvent{
   @override
   List<Object?> get props => [user];
 }
-

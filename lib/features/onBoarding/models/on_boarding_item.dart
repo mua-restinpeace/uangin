@@ -26,6 +26,5 @@ const onBoardingItems = [
   OnBoardingItem(
       image: 'lib/assets/images/Plain credit card-rafiki 1.svg',
       title: 'Start Building Better Money Habits!',
-      description:
-          ''),
+      description: ''),
 ];

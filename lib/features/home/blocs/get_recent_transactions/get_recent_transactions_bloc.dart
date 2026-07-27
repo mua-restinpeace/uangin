@@ -39,5 +39,14 @@ class GetRecentTransactionsBloc
         emit(GetRecentTransactionsSuccess(event.transactionList));
       },
     );
+
+    on<ResetRecentTransaction>(
+      (event, emit) async {
+        await _transactionSubscription?.cancel();
+
+        _transactionSubscription = null;
+        emit(GetRecentTransactionsInitial());
+      },
+    );
   }
 }

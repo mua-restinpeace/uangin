@@ -17,7 +17,7 @@ class GetExpenseSummary extends ExpenseSummaryEvent {
   List<Object> get props => [userId, filter];
 }
 
-class ExpenseSummaryUpdated extends ExpenseSummaryEvent{
+class ExpenseSummaryUpdated extends ExpenseSummaryEvent {
   final double totalSpent;
   final Map<String, double> breakdown;
 
@@ -26,3 +26,5 @@ class ExpenseSummaryUpdated extends ExpenseSummaryEvent{
   @override
   List<Object> get props => [totalSpent, breakdown];
 }
+
+class ResetExpenseSummary extends ExpenseSummaryEvent {}

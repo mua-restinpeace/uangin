@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
 import 'package:uangin/core/theme/colors.dart';
 import 'package:uangin/features/about_us/views/about_us_screen.dart';
 import 'package:uangin/features/account_information/views/account_information_screen.dart';
-import 'package:uangin/features/auth/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:uangin/features/help_center/views/help_center_screeen.dart';
 import 'package:uangin/features/notifiicatiion_setting/views/notification_screen.dart';
 import 'package:uangin/features/password_and_security/views/password_security_screen.dart';
@@ -180,7 +180,9 @@ class Settings extends StatelessWidget {
                   name: 'Logout',
                   icon: 'lib/assets/icons/logout-red.svg',
                   onTap: () {
-                    context.read<SignInBloc>().add(SignOutRequired());
+                    context
+                        .read<AuthenticationBloc>()
+                        .add(AuthenticationLogoutRequested());
                   },
                 )
               ],

@@ -13,7 +13,8 @@ class UpdateAccountInfoBloc
     on<UpdateAccountInfo>((event, emit) async {
       emit(UpdateAccountInfoLoading());
       try {
-        await _userRepository.updateAccountInformation(name: event.name, userId: event.userId, photoUrl: event.photoUrl);
+        await _userRepository.updateAccountInformation(
+            name: event.name, userId: event.userId, photoUrl: event.photoUrl);
 
         emit(UpdateAccountInfoSuccess());
       } catch (e) {

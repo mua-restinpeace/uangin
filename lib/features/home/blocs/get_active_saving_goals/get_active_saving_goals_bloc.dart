@@ -35,6 +35,14 @@ class GetActiveSavingGoalsBloc
     on<GetActiveGoalsUpdated>((event, emit) {
       emit(GetActiveSavingGoalsSuccess(event.goals));
     });
+
+    on<ResetActiveGoals>(
+      (event, emit) async {
+        await _goalsSubscription?.cancel();
+        _goalsSubscription = null;
+        emit(GetActiveSavingGoalsInitial());
+      },
+    );
   }
 
   @override

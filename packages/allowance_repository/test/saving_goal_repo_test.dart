@@ -14,7 +14,8 @@ void main() {
       repo = FirebaseAllowanceRepo(firestore: firestore);
     });
 
-    test('createdSavingGoal stores saving goal with isComplete field', () async {
+    test('createdSavingGoal stores saving goal with isComplete field',
+        () async {
       await repo.createdSavingGoal(
         userId: userId,
         name: 'Buy laptop',

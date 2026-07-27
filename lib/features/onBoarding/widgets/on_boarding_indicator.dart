@@ -19,11 +19,9 @@ class OnBoardingIndicator extends StatelessWidget {
           width: index == currentIndex ? 20 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: index == currentIndex
-              ? MyColors.primary
-              : MyColors.lightGrey,
-            borderRadius: BorderRadius.circular(4)
-          ),
+              color:
+                  index == currentIndex ? MyColors.primary : MyColors.lightGrey,
+              borderRadius: BorderRadius.circular(4)),
         ),
       ),
     );

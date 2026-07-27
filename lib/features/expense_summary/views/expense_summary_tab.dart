@@ -62,7 +62,8 @@ class _ExpenseSummaryScreenState extends State<ExpenseSummaryScreen> {
                       ExpenseSummaryChart(
                           breakdown: summaryState.breakdown,
                           totalSpent: summaryState.totalSpent,
-                          totalAllocated: getTotalAllocatedWithFilter(_selectedFilter),
+                          totalAllocated:
+                              getTotalAllocatedWithFilter(_selectedFilter),
                           budgets: budgets),
                       const SizedBox(
                         height: 24,
@@ -90,11 +91,13 @@ class _ExpenseSummaryScreenState extends State<ExpenseSummaryScreen> {
     );
   }
 
-  Widget _buildDropDownButton(BuildContext context){
+  Widget _buildDropDownButton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: MyColors.fillColor,
-        border: Border.all(color: MyColors.lightGrey,),
+        border: Border.all(
+          color: MyColors.lightGrey,
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
@@ -107,11 +110,14 @@ class _ExpenseSummaryScreenState extends State<ExpenseSummaryScreen> {
               width: 24,
               height: 24,
             ),
-            style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 14),
+            style: Theme.of(context)
+                .textTheme
+                .displayMedium
+                ?.copyWith(fontSize: 14),
             borderRadius: BorderRadius.circular(16),
             dropdownColor: MyColors.fillColor,
             onChanged: (SummaryFilter? newFilter) {
-              if(newFilter != null){
+              if (newFilter != null) {
                 setState(() {
                   _selectedFilter = newFilter;
                 });
@@ -180,7 +186,9 @@ class _ExpenseSummaryScreenState extends State<ExpenseSummaryScreen> {
               final color =
                   Color(int.parse('0xFF${budget.color.replaceAll('#', '')}'));
               final spentAmount = breakdown[budget.name] ?? 0.0;
-              final percentage = (spentAmount / getTotalAllocatedWithFilter(_selectedFilter) * 100);
+              final percentage = (spentAmount /
+                  getTotalAllocatedWithFilter(_selectedFilter) *
+                  100);
 
               return _buildBreakdownItem(
                   context, percentage, budget.name, spentAmount, color);

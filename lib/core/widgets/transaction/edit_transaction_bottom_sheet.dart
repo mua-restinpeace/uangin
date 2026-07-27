@@ -1,4 +1,3 @@
-
 import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -374,8 +373,8 @@ class _EditTransactionBottomSheetState
   void _handleSave() {
     if (_formKey.currentState!.validate()) {
       if (_selectedBudgets == null) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Please select a category')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a category')));
       }
 
       final rawAmount = _amountController.text

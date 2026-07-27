@@ -1,4 +1,3 @@
-
 import 'package:allowance_repository/allowance_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,8 +70,7 @@ class _AllowanceHistoryScreenState extends State<AllowanceHistoryScreen> {
           child: Column(
             children: [
               Expanded(
-                child: BlocBuilder<AllowanceHistoryBloc,
-                    AllowanceHistoryState>(
+                child: BlocBuilder<AllowanceHistoryBloc, AllowanceHistoryState>(
                   builder: (context, allowanceState) {
                     if (allowanceState is AllowanceHistoryLoading) {
                       return const Center(
@@ -110,8 +108,7 @@ class _AllowanceHistoryScreenState extends State<AllowanceHistoryScreen> {
                         );
                       }
 
-                      return _buildGroupedAllowance(
-                          context, grouped);
+                      return _buildGroupedAllowance(context, grouped);
                     }
 
                     if (allowanceState is AllowanceHistoryFailure) {
@@ -186,8 +183,8 @@ class _AllowanceHistoryScreenState extends State<AllowanceHistoryScreen> {
     );
   }
 
-  Widget _buildGroupedAllowance(BuildContext context,
-      Map<String, List<Allowances>> grouped) {
+  Widget _buildGroupedAllowance(
+      BuildContext context, Map<String, List<Allowances>> grouped) {
     final sortedKeys = grouped.keys.toList()
       ..sort(
         (a, b) {

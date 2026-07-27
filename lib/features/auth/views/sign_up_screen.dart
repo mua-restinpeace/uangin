@@ -271,7 +271,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 myUser.goalsAchieved = 0;
 
                                 setState(() {
-                                  context.read<SignUpBloc>().add(SignUpRequired(myUser, passwordController.text));
+                                  context.read<SignUpBloc>().add(SignUpRequired(
+                                      myUser, passwordController.text));
                                 });
                               }
                             });

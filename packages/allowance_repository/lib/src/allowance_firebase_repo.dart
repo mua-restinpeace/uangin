@@ -642,7 +642,7 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
         if (newAmount == targetAmount &&
             !(data['isComplete'] as bool? ?? false)) {
           updates['isComplete'] = true;
-          updates['completedDate'] = DateTime.now().millisecondsSinceEpoch;
+          updates['completedDate'] = Timestamp.fromDate(DateTime.now());
 
           transaction
               .update(userRef, {'goalsAchieved': FieldValue.increment(1)});

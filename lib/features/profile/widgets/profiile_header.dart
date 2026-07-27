@@ -57,18 +57,19 @@ class ProfileHeader extends StatelessWidget {
             right: 0,
             child: Center(
               child: Container(
-                width: 138,
-                height: 138,
-                decoration: BoxDecoration(
-                  color: MyColors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
+                  width: 138,
+                  height: 138,
+                  decoration: BoxDecoration(
                     color: MyColors.white,
-                    width: 8,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: MyColors.white,
+                      width: 8,
+                    ),
                   ),
-                ),
-                child: ProfileAvatar(user: user,)
-              ),
+                  child: ProfileAvatar(
+                    user: user,
+                  )),
             ),
           ),
 

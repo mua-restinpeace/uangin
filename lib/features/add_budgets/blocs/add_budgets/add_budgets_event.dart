@@ -16,15 +16,14 @@ class AddBudgetSubmitted extends AddBudgetsEvent {
   final DateTime periodStart;
   final DateTime periodEnd;
 
-  const AddBudgetSubmitted({
-    required this.userId,
-    required this.name,
-    required this.icon,
-    required this.color,
-    required this.allocatedAmount,
-    required this.periodStart,
-    required this.periodEnd
-  });
+  const AddBudgetSubmitted(
+      {required this.userId,
+      required this.name,
+      required this.icon,
+      required this.color,
+      required this.allocatedAmount,
+      required this.periodStart,
+      required this.periodEnd});
 
   @override
   List<Object> get props =>

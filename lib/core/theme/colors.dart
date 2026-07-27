@@ -4,7 +4,7 @@ class MyColors {
   static const primary = Color(0xffC9F56A);
   static const white = Color(0xffFDFEFF);
   static const onPrimary = Color(0xff3d3d3d);
-  static const grey  = Color(0xff888989);
+  static const grey = Color(0xff888989);
   static const lightGrey = Color(0xffdadada);
   static const fillColor = Color(0xffF9FAFC);
   static const black = Color(0xff12121b);

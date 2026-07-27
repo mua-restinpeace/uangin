@@ -90,7 +90,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ? LongButton(
                           text: 'Get Started',
                           onPressed: () {
-                            context.read<AuthenticationBloc>().add(AuthenticationOnBoardingCompleted());
+                            context
+                                .read<AuthenticationBloc>()
+                                .add(AuthenticationOnBoardingCompleted());
                           },
                         )
                       : Row(
@@ -115,7 +117,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             OnBoardingIndicator(currentIndex: _currentIndex),
                             MyButton(
                               onTap: _nextPage,
-                              content: SvgPicture.asset('lib/assets/icons/arrow-right.svg'),
+                              content: SvgPicture.asset(
+                                  'lib/assets/icons/arrow-right.svg'),
                             ),
                           ],
                         ),

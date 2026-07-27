@@ -7,7 +7,7 @@ sealed class GetTotalSpentEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetTotalSpent extends GetTotalSpentEvent{
+class GetTotalSpent extends GetTotalSpentEvent {
   final String userId;
   final DateTime periodStart;
   final DateTime periodEnd;
@@ -18,7 +18,7 @@ class GetTotalSpent extends GetTotalSpentEvent{
   List<Object> get props => [userId, periodStart, periodEnd];
 }
 
-class GetTotalSpentUpdated extends GetTotalSpentEvent{
+class GetTotalSpentUpdated extends GetTotalSpentEvent {
   final double spentAmount;
 
   const GetTotalSpentUpdated(this.spentAmount);

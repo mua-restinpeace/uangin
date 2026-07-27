@@ -66,7 +66,8 @@ class ExpenseSummaryChart extends StatelessWidget {
                               style: Theme.of(context)
                                   .textTheme
                                   .displayLarge
-                                  ?.copyWith(fontSize: 32, color: MyColors.grey)),
+                                  ?.copyWith(
+                                      fontSize: 32, color: MyColors.grey)),
                           const SizedBox(
                             width: 4,
                           ),

@@ -90,7 +90,7 @@ class _PasswordStrengthIndicatorState extends State<PasswordStrengthIndicator> {
   @override
   Widget build(BuildContext context) {
     final password = widget.password.text;
-    if (password.isEmpty) return SizedBox.shrink();
+    if (password.isEmpty) return const SizedBox.shrink();
 
     final strength = _strength(password);
     final color = _color(strength);
