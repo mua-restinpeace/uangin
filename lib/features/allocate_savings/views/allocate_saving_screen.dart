@@ -36,8 +36,30 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
         child: BlocListener<AllocateSavingsBloc, AllocateSavingsState>(
           listener: (context, state) {
             if (state is AllocateSavingsSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Money allocated successfully'),
+              final amountAdded = state.amountAdded;
+              final amountToAdd = state.amountToAdd;
+              final String message;
+              if(amountAdded == amountToAdd){
+                message = 'IDR ${MoneyFormatter(amount: amountAdded).output.nonSymbol} allocated successfully.';
+              } else if(amountAdded < amountToAdd){
+                if(state.goalCompleted){
+                  final excessAmount = amountToAdd - amountAdded;
+                  final excessFormatted = MoneyFormatter(amount: excessAmount).output.nonSymbol;
+                  final addedFormatted = MoneyFormatter(amount: amountAdded).output.nonSymbol;
+
+                  message = 'Goal Completed! IDR $addedFormatted allocated. IDR $excessFormatted returned to your saving balance.';
+                } else{
+                  final shortfall = amountToAdd - amountAdded;
+                  final shortfallFormatted = MoneyFormatter(amount: shortfall).output.nonSymbol;
+                  final addedFormatted = MoneyFormatter(amount: amountAdded).output.nonSymbol;
+
+                  message = 'IDR $addedFormatted allocated. IDR $shortfallFormatted could not be added, insufficient savings balance.';
+                }
+              } else {
+                message = 'Money allocated successfully';
+              }
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(message),
                 backgroundColor: MyColors.green,
               ));
               Navigator.pop(context);
@@ -134,7 +156,7 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
                           user.totalSaving,
                         ),
                         const Spacer(),
-                        _buildFormAllocateSaving(),
+                        _buildFormAllocateSaving(user.totalSaving),
                         const Spacer(),
                         BlocBuilder<AllocateSavingsBloc, AllocateSavingsState>(
                           builder: (context, state) {
@@ -164,10 +186,8 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
   }
 
   Widget _buildTargetRemaining(BuildContext context, double totalSaving) {
-    final targetRemainingAmount =
-        widget.goal.targetAmount - widget.goal.currentAmount;
-    final targetRemaining =
-        MoneyFormatter(amount: targetRemainingAmount).output.nonSymbol;
+    final totalSavingFormatted =
+        MoneyFormatter(amount: totalSaving).output.nonSymbol;
     return Container(
       decoration: BoxDecoration(
         color: MyColors.fillColor,
@@ -202,7 +222,7 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
                   Row(
                     children: [
                       Text(
-                        'IDR',
+                        'Target Amount: IDR',
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
@@ -221,11 +241,11 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
                             color: widget.goal.targetAmount < 0.0
                                 ? MyColors.red
                                 : MyColors.onPrimary),
-                      )
+                      ),
                     ],
                   ),
                   Text(
-                    'IDR $targetRemaining left',
+                    'IDR $totalSavingFormatted savings on your account',
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -240,7 +260,7 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
     );
   }
 
-  Widget _buildFormAllocateSaving() {
+  Widget _buildFormAllocateSaving(double totalSaving) {
     return Stack(
       children: [
         ClipRRect(
@@ -250,7 +270,6 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  // color: MyColors.white.withOpacity(1),
                   border: Border.all(
                       color: MyColors.white.withOpacity(0.1), width: 1.5),
                   boxShadow: [
@@ -269,7 +288,7 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
                       style: Theme.of(context)
                           .textTheme
                           .displayMedium
-                          ?.copyWith(fontSize: 18, color: MyColors.lightGrey),
+                          ?.copyWith(fontSize: 18, color: MyColors.grey),
                     ),
                     const SizedBox(
                       height: 12,
@@ -309,6 +328,10 @@ class _AllocateSavingScreenState extends State<AllocateSavingScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter amount!';
                                 }
+
+                                // if (double.tryParse(value)! < totalSaving) {
+                                //   return 'Insufficient saving amount';
+                                // }
                                 return null;
                               },
                               keyboardType: TextInputType.number,

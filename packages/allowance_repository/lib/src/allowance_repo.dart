@@ -83,7 +83,7 @@ abstract class AllowanceRepository {
       required double targetAmount,
       DateTime? targetDate});
 
-  Future<double> updateSavingGoalProgress(
+  Future<(double amountAdded, bool goalCompleted)> updateSavingGoalProgress(
       String userId, String goalId, double amountToAdd);
 
   Stream<List<SavingGoals>> getActiveSavingGoals(String userId);

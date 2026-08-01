@@ -14,10 +14,16 @@ final class AllocateSavingsLoading extends AllocateSavingsState {}
 final class AllocateSavingsFailure extends AllocateSavingsState {}
 
 final class AllocateSavingsSuccess extends AllocateSavingsState {
-  final double excessAmount;
+  final double amountToAdd;
+  final double amountAdded;
+  final bool goalCompleted;
 
-  const AllocateSavingsSuccess(this.excessAmount);
+  const AllocateSavingsSuccess({
+    required this.amountToAdd,
+    required this.amountAdded,
+    required this.goalCompleted,
+  });
 
   @override
-  List<Object> get props => [excessAmount];
+  List<Object> get props => [amountToAdd, amountAdded];
 }

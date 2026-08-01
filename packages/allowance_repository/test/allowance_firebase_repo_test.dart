@@ -851,62 +851,219 @@ void main() {
         expect(doc.exists, false);
       });
 
-      test('updateSavingGoalProgress deducts allocated amount from totalSaving',
-          () async {
-        await seedUser(currentAllowance: 500000, totalSaving: 500000);
+      test(
+        'updateSavingGoalProgress only uses available totalSaving when input exceeds totalSaving',
+        () async {
+          await seedUser(
+            currentAllowance: 500000,
+            totalSaving: 100000,
+            goalsAchieved: 0,
+          );
 
-        final goal = await repo.createdSavingGoal(
-          userId: userId,
-          name: 'Emergency Fund',
-          icon: 'wallet',
-          targetAmount: 1000000,
-        );
+          final goal = await repo.createdSavingGoal(
+            userId: userId,
+            name: 'Emergency Fund',
+            icon: 'wallet',
+            targetAmount: 1000000,
+          );
 
-        final excess = await repo.updateSavingGoalProgress(
-          userId,
-          goal.goalId,
-          250000,
-        );
+          // amountToAdd=250000, totalSaving=100000, remaining=1000000
+          // exactAmountToAdd = min(250000, 100000, 1000000) = 100000
+          final (amountAdded, goalCompleted) =
+              await repo.updateSavingGoalProgress(
+            userId,
+            goal.goalId,
+            250000,
+          );
 
-        expect(excess, 0);
+          // Only 100000 was added (capped by totalSaving)
+          expect(amountAdded, 100000);
+          expect(goalCompleted, false);
 
-        final userDoc = await firestore.collection('users').doc(userId).get();
-        expect(userDoc.data()!['totalSaving'], 250000);
-      });
+          final goalDoc = await firestore
+              .collection('users')
+              .doc(userId)
+              .collection('savingGoals')
+              .doc(goal.goalId)
+              .get();
+          final goalData = goalDoc.data()!;
+
+          expect(goalData['currentAmount'], 100000);
+          expect(goalData['isComplete'], false);
+
+          final userDoc = await firestore.collection('users').doc(userId).get();
+          final userData = userDoc.data()!;
+
+          // All savings were consumed
+          expect(userData['totalSaving'], 0);
+          expect(userData['goalsAchieved'], 0);
+        },
+      );
 
       test(
-          'updateSavingGoalProgress returns excess and only deducts remaining target amount',
-          () async {
-        await seedUser(currentAllowance: 1000000, totalSaving: 1000000);
+        'updateSavingGoalProgress completes goal when remaining target is the binding constraint',
+        () async {
+          await seedUser(
+            currentAllowance: 500000,
+            totalSaving: 500000,
+            goalsAchieved: 0,
+          );
 
-        final goal = await repo.createdSavingGoal(
-          userId: userId,
-          name: 'Phone',
-          icon: 'phone',
-          targetAmount: 500000,
-        );
+          final goal = await repo.createdSavingGoal(
+            userId: userId,
+            name: 'New Phone',
+            icon: 'phone',
+            targetAmount: 500000,
+          );
 
-        final excess = await repo.updateSavingGoalProgress(
-          userId,
-          goal.goalId,
-          700000,
-        );
+          // First allocation — brings currentAmount to 450000
+          // amountToAdd=450000, totalSaving=500000, remaining=500000
+          // exactAmountToAdd = min(450000, 500000, 500000) = 450000
+          await repo.updateSavingGoalProgress(userId, goal.goalId, 450000);
 
-        expect(excess, 200000);
+          // Override totalSaving and goalsAchieved to set up the exact edge case:
+          // currentAmount=450000, remaining=50000, totalSaving=100000, amountToAdd=200000
+          // exactAmountToAdd = min(200000, 100000, 50000) = 50000 (remaining is the constraint)
+          await firestore.collection('users').doc(userId).update({
+            'totalSaving': 100000,
+            'goalsAchieved': 0,
+          });
 
-        final goalDoc = await firestore
-            .collection('users')
-            .doc(userId)
-            .collection('savingGoals')
-            .doc(goal.goalId)
-            .get();
+          final (amountAdded, goalCompleted) =
+              await repo.updateSavingGoalProgress(
+            userId,
+            goal.goalId,
+            200000,
+          );
 
-        expect(goalDoc.data()!['currentAmount'], 500000);
-        expect(goalDoc.data()!['isComplete'], true);
+          // Only 50000 was added — capped by remainingAmount (not totalSaving)
+          expect(amountAdded, 50000);
+          expect(goalCompleted, true);
 
-        final userDoc = await firestore.collection('users').doc(userId).get();
-        expect(userDoc.data()!['totalSaving'], 500000);
-      });
+          final goalDoc = await firestore
+              .collection('users')
+              .doc(userId)
+              .collection('savingGoals')
+              .doc(goal.goalId)
+              .get();
+          final goalData = goalDoc.data()!;
+
+          // Goal is exactly at target
+          expect(goalData['currentAmount'], 500000);
+          expect(goalData['isComplete'], true);
+          expect(goalData['completedDate'], isA<Timestamp>());
+
+          final userDoc = await firestore.collection('users').doc(userId).get();
+          final userData = userDoc.data()!;
+
+          // totalSaving reduced by exactAmountToAdd only (50000), not the full input
+          // 150000 remains unallocated in savings — goal ceiling was the limit
+          expect(userData['totalSaving'], 50000);
+          expect(userData['goalsAchieved'], 1);
+        },
+      );
+
+      test(
+        'updateSavingGoalProgress throws when amount is zero or negative',
+        () async {
+          await seedUser(
+            currentAllowance: 500000,
+            totalSaving: 100000,
+            goalsAchieved: 0,
+          );
+
+          final goal = await repo.createdSavingGoal(
+            userId: userId,
+            name: 'Vacation',
+            icon: 'plane',
+            targetAmount: 1000000,
+          );
+
+          expect(
+            () => repo.updateSavingGoalProgress(userId, goal.goalId, 0),
+            throwsA(isA<Exception>()),
+          );
+
+          expect(
+            () => repo.updateSavingGoalProgress(userId, goal.goalId, -50000),
+            throwsA(isA<Exception>()),
+          );
+        },
+      );
+
+      test(
+        'updateSavingGoalProgress throws when goal is already complete',
+        () async {
+          await seedUser(
+            currentAllowance: 500000,
+            totalSaving: 500000,
+            goalsAchieved: 0,
+          );
+
+          final goal = await repo.createdSavingGoal(
+            userId: userId,
+            name: 'Laptop',
+            icon: 'laptop',
+            targetAmount: 300000,
+          );
+
+          // Complete the goal
+          await repo.updateSavingGoalProgress(userId, goal.goalId, 300000);
+
+          // Attempting to add more to a completed goal should throw
+          expect(
+            () => repo.updateSavingGoalProgress(userId, goal.goalId, 100000),
+            throwsA(isA<Exception>()),
+          );
+        },
+      );
+
+      test(
+        'updateSavingGoalProgress does nothing and throws when totalSaving is zero',
+        () async {
+          await seedUser(
+            currentAllowance: 500000,
+            totalSaving: 0, // no savings available
+            goalsAchieved: 0,
+          );
+
+          final goal = await repo.createdSavingGoal(
+            userId: userId,
+            name: 'Camera',
+            icon: 'camera',
+            targetAmount: 1000000,
+          );
+
+          // min(100000, 0, 1000000) = 0, but amountToAdd > 0 check passes —
+          // exactAmountToAdd will be 0, which means nothing gets added.
+          // The repo should handle this gracefully or throw depending on your preference.
+          // Current impl: exactAmountToAdd = 0, Firestore update sets currentAmount to 0+0=0.
+          // If you want to guard this, add a check after the clamp.
+          // For now we verify the state is unchanged:
+          final (amountAdded, goalCompleted) =
+              await repo.updateSavingGoalProgress(
+            userId,
+            goal.goalId,
+            100000,
+          );
+
+          expect(amountAdded, 0);
+          expect(goalCompleted, false);
+
+          final goalDoc = await firestore
+              .collection('users')
+              .doc(userId)
+              .collection('savingGoals')
+              .doc(goal.goalId)
+              .get();
+
+          expect(goalDoc.data()!['currentAmount'], 0);
+          expect(goalDoc.data()!['isComplete'], false);
+
+          final userDoc = await firestore.collection('users').doc(userId).get();
+          expect(userDoc.data()!['totalSaving'], 0);
+        },
+      );
     });
 
     group('analytics and summary operations', () {

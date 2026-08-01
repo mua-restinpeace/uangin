@@ -15,11 +15,15 @@ class AllocateSavingsBloc
     on<AllocateSaving>((event, emit) async {
       emit(AllocateSavingsLoading());
       try {
-        final result = await _allowanceRepository.updateSavingGoalProgress(
-            event.userId, event.goalId, event.amountToAdd);
+        final (amountAdded, goalCompleted) =
+            await _allowanceRepository.updateSavingGoalProgress(
+                event.userId, event.goalId, event.amountToAdd);
 
-        log('IDR ${event.amountToAdd} saving money is allocated to saving goal ${event.goalId}. excess amount: $result');
-        emit(AllocateSavingsSuccess(result));
+        emit(AllocateSavingsSuccess(
+          amountAdded: amountAdded,
+          amountToAdd: event.amountToAdd,
+          goalCompleted: goalCompleted,
+        ));
       } catch (e) {
         log('Allocate saving error: $e');
         emit(AllocateSavingsFailure());
