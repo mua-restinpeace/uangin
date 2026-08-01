@@ -610,54 +610,91 @@ class FirebaseAllowanceRepo implements AllowanceRepository {
   }
 
   @override
-  Future<double> updateSavingGoalProgress(
+  Future<(double amountAdded, bool goalCompleted)> updateSavingGoalProgress(
       String userId, String goalId, double amountToAdd) async {
     try {
-      final docRef = _firestore
+      if (amountToAdd <= 0) {
+        throw Exception('amount must be greater than zero');
+      }
+
+      final userRef = _firestore.collection('users').doc(userId);
+
+      final goalRef = _firestore
           .collection('users')
           .doc(userId)
           .collection('savingGoals')
           .doc(goalId);
 
-      var excessAmount = 0.0;
+      double exactAmountToAdd = 0.0;
+      bool goalCompleted = false;
 
       await _firestore.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
-        if (!snapshot.exists) {
+        final userSnapshot = await transaction.get(userRef);
+
+        if (!userSnapshot.exists || userSnapshot.data() == null) {
+          throw Exception('user not found');
+        }
+
+        final userData = userSnapshot.data()!;
+        final totalSaving =
+            (userData['totalSaving'] as num?)?.toDouble() ?? 0.0;
+
+        final goalSnapshot = await transaction.get(goalRef);
+
+        if (!goalSnapshot.exists || goalSnapshot.data() == null) {
           throw Exception('saving goal not found');
         }
 
-        final data = snapshot.data()!;
+        final goalData = goalSnapshot.data()!;
+
         final currentAmount =
-            (data['currentAmount'] as num?)?.toDouble() ?? 0.0;
-        final targetAmount = (data['targetAmount'] as num).toDouble();
-        final remaining = targetAmount - currentAmount;
-        final exactAmountToAdd = amountToAdd.clamp(0.00, remaining);
-        excessAmount = amountToAdd - exactAmountToAdd;
+            (goalData['currentAmount'] as num?)?.toDouble() ?? 0.0;
+        final targetAmount =
+            (goalData['targetAmount'] as num?)?.toDouble() ?? 0.0;
+        final isComplete = goalData['isComplete'] as bool? ?? false;
+
+        if (isComplete) {
+          throw Exception('saving goal is already complete');
+        }
+
+        final remainingAmount = targetAmount - currentAmount;
+
+        if (remainingAmount <= 0) {
+          throw Exception('saving goal has no remaining amount');
+        }
+
+        exactAmountToAdd = [
+          amountToAdd,
+          totalSaving,
+          remainingAmount,
+        ].reduce((a, b) => a < b ? a : b);
+
         final newAmount = currentAmount + exactAmountToAdd;
 
-        final updates = <String, dynamic>{'currentAmount': newAmount};
-        final userRef = _firestore.collection('users').doc(userId);
+        final updates = <String, dynamic>{
+          'currentAmount': newAmount,
+        };
 
-        if (newAmount == targetAmount &&
-            !(data['isComplete'] as bool? ?? false)) {
+        if (newAmount >= targetAmount) {
+          goalCompleted = true;
+          updates['currentAmount'] = targetAmount;
           updates['isComplete'] = true;
           updates['completedDate'] = Timestamp.fromDate(DateTime.now());
 
-          transaction
-              .update(userRef, {'goalsAchieved': FieldValue.increment(1)});
+          transaction.update(userRef, {
+            'goalsAchieved': FieldValue.increment(1),
+          });
         }
 
-        transaction.update(docRef, updates);
-        transaction.update(
-            userRef, {'totalSaving': FieldValue.increment(-exactAmountToAdd)});
+        transaction.update(goalRef, updates);
+
+        transaction.update(userRef, {
+          'totalSaving': FieldValue.increment(-exactAmountToAdd),
+        });
       });
 
-      if (excessAmount > 0) {
-        return excessAmount;
-      }
       log('saving goal updated: $goalId');
-      return 0;
+      return (exactAmountToAdd, goalCompleted);
     } catch (e) {
       log('error updating saving goal progress: $e');
       rethrow;
