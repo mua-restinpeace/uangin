@@ -97,17 +97,28 @@ class _RoundedDonutChartPainter extends CustomPainter {
       0.0,
       (previousValue, element) => previousValue + element,
     );
-    final unallocated = totalAllocated - totalSpent;
+    final effectiveTotal = totalSpent.clamp(0.0, totalAllocated);
+    final unallocated = totalAllocated - effectiveTotal;
 
     final sectionCount = data.length + (unallocated > 0 ? 1 : 0);
     final totalGaps = gapAngle * sectionCount;
     final usableCircle = (2 * math.pi) - totalGaps;
 
+    double remainingCircle = usableCircle;
+
     data.forEach(
       (category, value) {
+        final clampedValue = value.clamp(0.0, totalAllocated);
+        final rawSweep = (clampedValue / totalAllocated) * usableCircle;
+        final cappedSweep = rawSweep.clamp(0.0, remainingCircle);
+
         final sweepAngle = Tween<double>(
-                begin: 0, end: (value / totalAllocated) * usableCircle)
-            .animate(animationController);
+          begin: 0,
+          end: cappedSweep,
+        ).animate(animationController);
+
+        remainingCircle -= cappedSweep;
+
         final color = colors[category] ?? MyColors.grey;
 
         final paint = Paint()
