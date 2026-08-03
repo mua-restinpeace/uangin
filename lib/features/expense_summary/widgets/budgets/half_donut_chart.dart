@@ -105,7 +105,7 @@ class _HalfDonutChartPainter extends CustomPainter {
     canvas.drawArc(rect, startAngle, sweepAngle, false, unusedbudgetPaint);
 
     final usedBudgetSweepAngle =
-        Tween<double>(begin: 0, end: (spentAmount / totalAllowance) * math.pi)
+        Tween<double>(begin: 0, end: (spentAmount / totalAllowance).clamp(0.0, 1.0) * math.pi)
             .animate(animationController);
 
     final usedOutlinePaint = Paint()

@@ -447,14 +447,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          goal.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(fontSize: 12),
+                        Expanded(
+                          child: Text(
+                            goal.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(fontSize: 12),
+                          ),
                         ),
-                        const Spacer(),
+                        const SizedBox(
+                          width: 12,
+                        ),
                         Row(
                           children: [
                             Text(

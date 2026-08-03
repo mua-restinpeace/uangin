@@ -97,12 +97,19 @@ class SavingGoalGrid extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      toBeginningOfSentenceCase(goal.name),
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayMedium
-                          ?.copyWith(fontSize: 16),
+                    Expanded(
+                      child: Text(
+                        toBeginningOfSentenceCase(goal.name),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium
+                            ?.copyWith(fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 12,
                     ),
                     MyButton(
                         onTap: () {
