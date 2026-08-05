@@ -1,7 +1,9 @@
 import 'package:allowance_repository/allowance_repository.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uangin/blocs/authenticaton_bloc/authentication_bloc.dart';
+import 'package:uangin/blocs/connectivity/connectivity_bloc.dart';
 import 'package:uangin/blocs/delete_transaction/delete_transaction_bloc.dart';
 import 'package:uangin/blocs/expense_summary/expense_summary_bloc.dart';
 import 'package:uangin/blocs/get_budgets/get_budgets_bloc.dart';
@@ -10,6 +12,7 @@ import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/features/account_information/blocs/update_account_info/update_account_info_bloc.dart';
 import 'package:uangin/features/allowance_history/blocs/allowance_history/allowance_history_bloc.dart';
+import 'package:uangin/features/app_connectivity_wrapper.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
 import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
@@ -51,6 +54,9 @@ class _MyAppViewState extends State<MyAppView> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => ConnectivityBloc(Connectivity())..add(ConnectivityStarted())
+        ),
         BlocProvider(
             create: (context) =>
                 GetBudgetsBloc(context.read<AllowanceRepository>())),
@@ -96,46 +102,48 @@ class _MyAppViewState extends State<MyAppView> {
           title: 'Uangin',
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
-          home: BlocListener<AuthenticationBloc, AuthenticationState>(
-            listener: (context, state) {
-              if (state.status == AuthenticationStatus.authenticated) {
-                context.read<GetUserBloc>().add(const GetUser());
-              }
-
-              if (state.status == AuthenticationStatus.unauthenticated) {
-                context.read<GetBudgetsBloc>().add(ResetBudget());
-                context
-                    .read<GetRecentTransactionsBloc>()
-                    .add(ResetRecentTransaction());
-                context.read<ExpenseSummaryBloc>().add(ResetExpenseSummary());
-                context
-                    .read<GetTotalAllocatedBudgetsBloc>()
-                    .add(ResetTotalAllocatedBudget());
-                context
-                    .read<GetActiveSavingGoalsBloc>()
-                    .add(ResetActiveGoals());
-              }
-            },
-            child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                builder: (context, state) {
-              if (_splashScren) {
-                return const SplashScreen();
-              }
-
-              if (state.status == AuthenticationStatus.authenticated) {
-                return MainScaffold(
-                  key: _mainScaffoldKey,
-                );
-              }
-
-              if (state.status == AuthenticationStatus.unauthenticated) {
-                return AuthScreen(
-                  key: _authScreenKey,
-                );
-              }
-
-              return const OnBoardingScreen();
-            }),
+          home: AppConnectivityWrapper(
+            child: BlocListener<AuthenticationBloc, AuthenticationState>(
+              listener: (context, state) {
+                if (state.status == AuthenticationStatus.authenticated) {
+                  context.read<GetUserBloc>().add(const GetUser());
+                }
+            
+                if (state.status == AuthenticationStatus.unauthenticated) {
+                  context.read<GetBudgetsBloc>().add(ResetBudget());
+                  context
+                      .read<GetRecentTransactionsBloc>()
+                      .add(ResetRecentTransaction());
+                  context.read<ExpenseSummaryBloc>().add(ResetExpenseSummary());
+                  context
+                      .read<GetTotalAllocatedBudgetsBloc>()
+                      .add(ResetTotalAllocatedBudget());
+                  context
+                      .read<GetActiveSavingGoalsBloc>()
+                      .add(ResetActiveGoals());
+                }
+              },
+              child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, state) {
+                if (_splashScren) {
+                  return const SplashScreen();
+                }
+            
+                if (state.status == AuthenticationStatus.authenticated) {
+                  return MainScaffold(
+                    key: _mainScaffoldKey,
+                  );
+                }
+            
+                if (state.status == AuthenticationStatus.unauthenticated) {
+                  return AuthScreen(
+                    key: _authScreenKey,
+                  );
+                }
+            
+                return const OnBoardingScreen();
+              }),
+            ),
           )),
     );
   }

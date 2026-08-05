@@ -45,6 +45,8 @@ dependencies:
   currency_text_input_formatter:
   flutter_launcher_icons:
   workmanager:
+  connectivity_plus:
+  internet_connection_checker_plus:
 
   user_repository:
     path: packages/user_repository
@@ -148,6 +150,8 @@ flutter:
     - lib/assets/icons/cevron-right-circle.svg
     - lib/assets/icons/logo.svg
     - lib/assets/icons/info-circle.svg
+    - lib/assets/icons/no-internet.svg
+    - lib/assets/icons/wifi.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
