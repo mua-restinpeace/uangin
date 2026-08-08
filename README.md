@@ -14,6 +14,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
@@ -33,6 +34,20 @@ The app is built as a personal project with the goal of being a fully functional
 
 ---
 
+## Screenshots
+
+
+<p align="center">
+  <img src="docs/screenshots/home.png" width="250" />
+  <img src="docs/screenshots/wallet.png" width="250" />
+  <img src="docs/gifs/add-expense.gif" width="250" style="border-radius: 16px;"/>
+  <img src="docs/screenshots/spending-analysis.png" width="250" />
+  <img src="docs/screenshots/profile.png" width="250" />
+</p>
+
+
+---
+
 ## Features
 
 ### 💰 Allowance Management
@@ -41,16 +56,30 @@ The app is built as a personal project with the goal of being a fully functional
 - Correct balance with an audit-safe **balance correction** entry (logs the delta, not a silent overwrite)
 - View full allowance history with type indicators (Top Up vs Correction)
 
+<p align="center">
+  <img src="docs/gifs/add-allowance.gif" style="border-radius: 16px;"/>
+  <img src="docs/screenshots/allowance-history.png" />
+</p>
+
 ### 📊 Budget Tracking
 - Create spending budgets per category (Food, Transport, Entertainment, etc.)
 - Each budget has an allocated amount, a period (start/end date), and tracks spent amount in real time
 - Visual progress bars showing how much of each budget has been used
 - Spending Analysis screen with weekly summary and budget breakdown charts
 
+<p align="center">
+  <img src="docs/gifs/budgets.gif" style="border-radius: 16px;"/>
+</p>
+
 ### 🧾 Expense Recording
 - Record expenses against a specific budget
 - Edit or delete existing transactions with full audit support (adjusts budget `spentAmount` and `currentAllowance` atomically via Firestore batch writes)
 - Recent transactions on the home screen; full transaction history with filtering
+
+<p align="center">
+  <img src="docs/gifs/add-expense.gif" style="border-radius: 16px;" />
+  <img src="docs/screenshots/expense-history.png" />
+</p>
 
 ### 🎯 Saving Goals
 - Create saving goals with a target amount and optional target date
@@ -58,12 +87,32 @@ The app is built as a personal project with the goal of being a fully functional
 - Automatic goal completion detection — marks complete and increments `goalsAchieved` counter
 - Cancel goals to return allocated money to the savings pool
 
+<p align="center">
+  <img src="docs/screenshots/wallet.png" />
+</p>
+
 ### 👤 Profile & Settings
 - **Account Information** — edit display name and profile photo (stored as Base64 in Firestore)
 - **Password & Security** — change password with reauthentication and live password strength indicator
 - **Allowance History** — scrollable log of all allowance entries
 - **Help Center** — accordion FAQ covering all app features
 - **About** — app version, developer info, tech stack
+
+<p align="center">
+  <img src="docs/screenshots/profile.png" />
+</p>
+
+### 📶 Network Status Awareness
+- Real-time internet connectivity monitoring via `ConnectivityBloc`, combining `connectivity_plus` (network interface changes) with `internet_connection_checker_plus` (actual internet reachability, not just a network link)
+- A dismissible banner (`NoInternetBanner`) slides in from the top of the screen:
+  - **Red banner** — "No internet connection", shown for as long as the device is offline
+  - **Green banner** — "Back online", shown briefly (2 seconds) when connectivity is restored, then auto-hides
+- Wraps the entire app via `AppConnectivityWrapper` in `app_view.dart`, so the banner overlays on top of whatever screen the user is currently on
+- Animated with `AnimatedSwitcher` for a smooth fade/slide transition between online, offline, and restored states
+
+<p align="center">
+  <img src="docs/gifs/no-internet-banner.gif" style="border-radius: 16px;" width="300"/>
+</p>
 
 ---
 
@@ -105,6 +154,7 @@ uangin/
 │   │
 │   ├── blocs/                     # App-wide blocs
 │   │   ├── authenticaton_bloc/    # Auth stream listener
+│   │   ├── connectivity/          # Internet connectivity monitoring
 │   │   ├── delete_transaction/
 │   │   ├── expense_summary/
 │   │   ├── get_budgets/
@@ -120,6 +170,7 @@ uangin/
 │   │       ├── custom_linear_progress_bar.dart
 │   │       ├── profile_avatar.dart
 │   │       ├── password_strength_indicator.dart
+│   │       ├── no_internet_banner.dart  # Online/offline status banner
 │   │       └── transaction/       # TransactionItem, EditBottomSheet
 │   │
 │   └── features/                  # Feature modules
@@ -141,7 +192,8 @@ uangin/
 │       ├── help_center/           # FAQ accordion
 │       ├── about_us/              # App info
 │       ├── theme/                 # Theme toggle (WIP)
-│       └── onBoarding/            # Splash + onboarding
+│       ├── onBoarding/            # Splash + onboarding
+│       └── app_connectivity_wrapper.dart  # Wraps app, shows online/offline banner
 │
 └── packages/
     ├── user_repository/           # Auth + user Firestore ops
@@ -291,6 +343,7 @@ feature/
 | `GetTotalAllocatedBudgetsBloc` | Sums all active budget allocations |
 | `DeleteTransactionBloc` | Handles atomic transaction deletion |
 | `UpdateTransactionBloc` | Handles atomic transaction editing |
+| `ConnectivityBloc` | Monitors real internet reachability and drives the online/offline banner |
 
 **Feature-scoped blocs** are provided locally at the screen level with `BlocProvider` and disposed when the screen is popped.
 
@@ -382,6 +435,8 @@ flutter run
 | `flutter_image_compress` | Image compression before Base64 encoding |
 | `package_info_plus` | App version reading |
 | `workmanager` | Background task scheduling |
+| `connectivity_plus` | Detects network interface / connection type changes |
+| `internet_connection_checker_plus` | Verifies actual internet reachability (not just network link) |
 
 ---
 
