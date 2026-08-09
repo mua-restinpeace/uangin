@@ -40,7 +40,7 @@ The app is built as a personal project with the goal of being a fully functional
 <p align="center">
   <img src="docs/screenshots/home.png" width="250" />
   <img src="docs/screenshots/wallet.png" width="250" />
-  <img src="docs/gifs/add-expense.gif" width="250" style="border-radius: 16px;"/>
+  <img src="docs/gifs/add-expense.gif" width="250"/>
   <img src="docs/screenshots/spending-analysis.png" width="250" />
   <img src="docs/screenshots/profile.png" width="250" />
 </p>
@@ -57,7 +57,7 @@ The app is built as a personal project with the goal of being a fully functional
 - View full allowance history with type indicators (Top Up vs Correction)
 
 <p align="center">
-  <img src="docs/gifs/add-allowance.gif" style="border-radius: 16px;"/>
+  <img src="docs/gifs/add-allowance.gif"/>
   <img src="docs/screenshots/allowance-history.png" />
 </p>
 
@@ -68,7 +68,7 @@ The app is built as a personal project with the goal of being a fully functional
 - Spending Analysis screen with weekly summary and budget breakdown charts
 
 <p align="center">
-  <img src="docs/gifs/budgets.gif" style="border-radius: 16px;"/>
+  <img src="docs/gifs/budgets.gif"/>
 </p>
 
 ### 🧾 Expense Recording
@@ -77,7 +77,7 @@ The app is built as a personal project with the goal of being a fully functional
 - Recent transactions on the home screen; full transaction history with filtering
 
 <p align="center">
-  <img src="docs/gifs/add-expense.gif" style="border-radius: 16px;" />
+  <img src="docs/gifs/add-expense.gif" />
   <img src="docs/screenshots/expense-history.png" />
 </p>
 
@@ -111,7 +111,7 @@ The app is built as a personal project with the goal of being a fully functional
 - Animated with `AnimatedSwitcher` for a smooth fade/slide transition between online, offline, and restored states
 
 <p align="center">
-  <img src="docs/gifs/no-internet-banner.gif" style="border-radius: 16px;" width="300"/>
+  <img src="docs/gifs/no-internet-banner.gif" width="300"/>
 </p>
 
 ---

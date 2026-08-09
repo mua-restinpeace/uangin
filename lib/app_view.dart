@@ -12,7 +12,7 @@ import 'package:uangin/blocs/update_transaction/update_transaction_bloc.dart';
 import 'package:uangin/blocs/user/get_user/get_user_bloc.dart';
 import 'package:uangin/features/account_information/blocs/update_account_info/update_account_info_bloc.dart';
 import 'package:uangin/features/allowance_history/blocs/allowance_history/allowance_history_bloc.dart';
-import 'package:uangin/features/app_connectivity_wrapper.dart';
+import 'package:uangin/app_connectivity_wrapper.dart';
 import 'package:uangin/features/auth/views/auth_screen.dart';
 import 'package:uangin/features/home/blocs/get_active_saving_goals/get_active_saving_goals_bloc.dart';
 import 'package:uangin/features/home/blocs/get_recent_transactions/get_recent_transactions_bloc.dart';
